@@ -1,0 +1,10 @@
+{
+  "name": "papermill-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "echo 'Starting simple server...' && npx http-server -p 5173 -a 0.0.0.0"
+  },
+  "dependencies": {
+    "http-server": "^14.0.0"
+  }
+}

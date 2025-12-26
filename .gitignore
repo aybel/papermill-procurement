@@ -1,0 +1,116 @@
+# ============================================
+# PAPERMILL PROCUREMENT SYSTEM - GITIGNORE
+# ============================================
+
+# --------------------
+# BACKEND (Laravel en /backend)
+# --------------------
+backend/vendor/
+backend/node_modules/
+backend/.env
+backend/.env.backup
+backend/.env.production
+backend/.env.local
+backend/.phpunit.result.cache
+backend/storage/*.key
+backend/public/hot
+backend/public/storage
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/framework/cache/*
+backend/bootstrap/cache/*
+backend/composer.lock
+backend/package-lock.json
+backend/yarn.lock
+backend/npm-debug.log
+backend/yarn-error.log
+
+# Laravel compiled class map
+backend/bootstrap/cache/packages.php
+backend/bootstrap/cache/services.php
+backend/bootstrap/cache/config.php
+
+# --------------------
+# FRONTEND (Node en /frontend)
+# --------------------
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/.vite-inspect
+frontend/package-lock.json
+frontend/yarn.lock
+frontend/pnpm-lock.yaml
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.npm
+frontend/.yarn
+frontend/.yarn/cache
+frontend/.yarn/unplugged
+frontend/.yarn/build-state.yml
+frontend/.yarn/install-state.gz
+frontend/.pnp.*
+
+# --------------------
+# DOCKER
+# --------------------
+docker-compose.override.yml
+.docker/
+*.log
+
+# Docker volumes (datos de bases de datos)
+mysql_data/
+redis_data/
+
+# --------------------
+# SISTEMA / IDE
+# --------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+.vs/
+*.swp
+*.swo
+*~
+
+# --------------------
+# ARCHIVOS TEMPORALES
+# --------------------
+*.backup
+*.bak
+/tmp
+temp/
+logs/
+*.log
+
+# --------------------
+# ENTORNOS VIRTUALES / DEPENDENCIAS
+# --------------------
+.env
+.env.*
+!.env.example
+!.env.docker.example
+
+# --------------------
+# ARCHIVOS DE CONFIGURACIÓN LOCAL
+# --------------------
+docker-compose.local.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
+
+# --------------------
+# CERTIFICADOS SSL
+# --------------------
+*.pem
+*.crt
+*.key
