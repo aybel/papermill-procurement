@@ -17,7 +17,7 @@ Papermill Procurement es una solución integral para la gestión de compras y ap
 
 ### Backend
 - **Laravel 12** - Framework PHP
-- **PHP 8.2+** - Lenguaje de programación
+- **PHP 8.4** - Lenguaje de programación
 - **MySQL 8.0** - Base de datos
 - **Redis 7** - Caché y colas
 
