@@ -172,6 +172,26 @@ El sistema utiliza MySQL 8.0 con las siguientes características:
 - **Contraseña**: `papermill_pass`
 - **Puerto externo**: `3307`
 
+### Estructura de Tablas
+
+El sistema cuenta con 11 tablas principales más una vista:
+
+**Catálogos:**
+- **supplier_types**: Tipos de proveedores (materia prima, empaque, químicos, servicios, equipamiento)
+- **supplier_statuses**: Estados de proveedores (activo, suspendido, inactivo)
+
+**Tablas principales:**
+- **material_categories**: Categorías jerárquicas de materiales
+- **suppliers**: Proveedores con métricas de desempeño
+- **supplier_contacts**: Múltiples contactos por proveedor
+- **materials**: Materiales con especificaciones para papel
+- **purchase_requisitions**: Requisiciones de compra
+- **purchase_orders**: Órdenes de compra
+- **purchase_order_items**: Ítems de órdenes
+- **receipts**: Recepción de materiales
+- **quality_inspections**: Inspecciones de calidad específicas para papel
+- **supplier_performance_daily**: Vista de KPIs de proveedores
+
 ### Migraciones
 
 ```bash
@@ -229,4 +249,4 @@ Para soporte y preguntas, por favor crear un issue en el repositorio.
 
 ---
 
-Desarrollado con ❤️ para la industria papelera
+Desarrollado con ❤️ para el departamento de compras
