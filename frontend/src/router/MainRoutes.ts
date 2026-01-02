@@ -1,57 +1,199 @@
 const MainRoutes = {
-    path: '/main',
-    meta: {
-        requiresAuth: true
+  path: "/",
+  meta: {
+    requiresAuth: true,
+  },
+  //redirect: "/home",
+  component: () => import("@/layouts/full/FullLayout.vue"),
+  children: [
+    {
+      path: "",
+      name: "Home",
+      component: () => import("@/views/Home.vue"),
     },
-    redirect: '/main',
-    component: () => import('@/layouts/full/FullLayout.vue'),
-    children: [
-        {
-            name: 'Dashboard',
-            path: '/',
-            component: () => import('@/views/dashboard/index.vue')
-        },
-        {
-            name: 'Typography',
-            path: '/ui/typography',
-            component: () => import('@/views/components/Typography.vue')
-        },
-        {
-            name: 'Shadow',
-            path: '/ui/shadow',
-            component: () => import('@/views/components/Shadow.vue')
-        },
-        {
-            name: 'Alert',
-            path: '/ui/alerts',
-            component: () => import('@/views/ui-components/Alerts.vue')
-        },
-        {
-            name: 'Buttons',
-            path: '/ui/buttons',
-            component: () => import('@/views/ui-components/Buttons.vue')
-        },
-        {
-            name: 'Cards',
-            path: '/ui/cards',
-            component: () => import('@/views/ui-components/Cards.vue')
-        },
-        {
-            name: 'Tables',
-            path: '/ui/tables',
-            component: () => import('@/views/ui-components/Tables.vue')
-        },
-        {
-            name: 'Icons',
-            path: '/icons',
-            component: () => import('@/views/pages/Icons.vue')
-        },
-        {
-            name: 'Starter',
-            path: '/sample-page',
-            component: () => import('@/views/pages/SamplePage.vue')
-        },
-    ]
+    
+    // ==================== PROVEEDORES ====================
+    {
+      path: "suppliers",
+      name: "Suppliers",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "suppliers/create",
+      name: "SupplierCreate",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "suppliers/:id/edit",
+      name: "SupplierEdit",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "suppliers/:id",
+      name: "SupplierDetail",
+      component: () => import("@/views/Home.vue"),
+    },
+    
+    // Contactos de proveedores
+    {
+      path: "supplier-contacts",
+      name: "SupplierContacts",
+      component: () => import("@/views/Home.vue"),
+    },
+    
+    // Desempeño de proveedores
+    {
+      path: "supplier-performance",
+      name: "SupplierPerformance",
+      component: () => import("@/views/Home.vue"),
+    },
+
+    // ==================== MATERIALES ====================
+    {
+      path: "materials",
+      name: "Materials",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "materials/create",
+      name: "MaterialCreate",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "materials/:id/edit",
+      name: "MaterialEdit",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "materials/:id",
+      name: "MaterialDetail",
+      component: () => import("@/views/Home.vue"),
+    },
+
+    // Categorías de materiales
+    {
+      path: "material-categories",
+      name: "MaterialCategories",
+      component: () => import("@/views/Home.vue"),
+    },
+
+    // ==================== REQUISICIONES ====================
+    {
+      path: "purchase-requisitions",
+      name: "PurchaseRequisitions",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "purchase-requisitions/create",
+      name: "PurchaseRequisitionCreate",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "purchase-requisitions/:id/edit",
+      name: "PurchaseRequisitionEdit",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "purchase-requisitions/:id",
+      name: "PurchaseRequisitionDetail",
+      component: () => import("@/views/Home.vue"),
+    },
+
+    // ==================== ÓRDENES DE COMPRA ====================
+    {
+      path: "purchase-orders",
+      name: "PurchaseOrders",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "purchase-orders/create",
+      name: "PurchaseOrderCreate",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "purchase-orders/:id/edit",
+      name: "PurchaseOrderEdit",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "purchase-orders/:id",
+      name: "PurchaseOrderDetail",
+      component: () => import("@/views/Home.vue"),
+    },
+
+    // ==================== RECEPCIONES ====================
+    {
+      path: "receipts",
+      name: "Receipts",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "receipts/create",
+      name: "ReceiptCreate",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "receipts/:id",
+      name: "ReceiptDetail",
+      component: () => import("@/views/Home.vue"),
+    },
+
+    // ==================== INSPECCIONES DE CALIDAD ====================
+    {
+      path: "quality-inspections",
+      name: "QualityInspections",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "quality-inspections/create",
+      name: "QualityInspectionCreate",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "quality-inspections/:id",
+      name: "QualityInspectionDetail",
+      component: () => import("@/views/Home.vue"),
+    },
+
+    // ==================== CATÁLOGOS ====================
+    {
+      path: "catalogs/currencies",
+      name: "Currencies",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "catalogs/payment-terms",
+      name: "PaymentTerms",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "catalogs/supplier-types",
+      name: "SupplierTypes",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "catalogs/supplier-statuses",
+      name: "SupplierStatuses",
+      component: () => import("@/views/Home.vue"),
+    },
+
+    // ==================== REPORTES ====================
+    {
+      path: "reports/suppliers",
+      name: "SupplierReports",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "reports/purchases",
+      name: "PurchaseReports",
+      component: () => import("@/views/Home.vue"),
+    },
+    {
+      path: "reports/inventory",
+      name: "InventoryReports",
+      component: () => import("@/views/Home.vue"),
+    },
+  ],
 };
 
 export default MainRoutes;
