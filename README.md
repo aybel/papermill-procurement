@@ -81,6 +81,58 @@ docker exec -it papermill-node sh
 # Dentro del contenedor
 npm install
 ```
+## Limpieza de Caché en Docker
+
+Cuando trabajas con Vite en un contenedor Docker, es necesario limpiar el caché de Vite después de hacer cambios significativos en el código, especialmente cuando:
+
+- Modificas archivos de configuración (rutas, imports, exports)
+- Cambias dependencias o módulos
+- Actualizas componentes del sistema de navegación
+- El navegador muestra páginas en blanco o errores 404 sin razón aparente
+
+### ¿Por qué es necesario?
+
+El caché de Vite se almacena dentro del contenedor Docker en `node_modules/.vite`. Cuando haces cambios en el código de tu máquina local, Docker sincroniza los archivos, pero el caché de Vite puede quedar desactualizado, causando:
+
+- Errores de módulos no encontrados
+- Exportaciones que no se reconocen
+- Páginas en blanco
+- Componentes que no se actualizan
+
+### Comandos para limpiar caché
+
+**Opción 1: Reiniciar el contenedor (más rápido)**
+```bash
+docker-compose restart
+```
+
+**Opción 2: Limpiar caché manualmente**
+```bash
+docker exec <nombre_del_contenedor> rm -rf node_modules/.vite
+docker-compose restart
+```
+
+**Opción 3: Reconstruir completamente (cuando las anteriores no funcionan)**
+```bash
+docker-compose down
+docker-compose up -d --build
+```
+
+### Ver logs del contenedor
+
+Para diagnosticar problemas:
+```bash
+docker-compose logs -f
+```
+
+### Encontrar el nombre del contenedor
+
+```bash
+docker ps
+```
+
+**Nota:** Después de limpiar el caché, siempre actualiza el navegador con `Ctrl+Shift+R` (hard refresh) para limpiar también el caché del navegador.
+
 
 ## 🎮 Scripts de PowerShell
 
