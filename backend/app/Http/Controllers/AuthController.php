@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -43,7 +44,17 @@ class AuthController extends Controller
 
     public function me()
     {
-        return response()->json(Auth::guard('api')->user());
+        $user = auth()->user();
+
+        // Cargamos los roles y permisos del usuario
+        $roles = $user->getRoleNames();
+        $permissions = $user->getAllPermissions()->pluck('name');
+
+        return response()->json([
+            'user' => $user,
+            'roles' => $roles,
+            'permissions' => $permissions,
+        ]);
     }
 
     public function logout()
