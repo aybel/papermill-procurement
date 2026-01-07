@@ -293,9 +293,9 @@ Este proyecto está bajo la Licencia MIT.
 
 ## 👥 Autores
 
-- **Tu Nombre** - *Desarrollo Inicial*
+- **Tu Nombre** - *Jesus Abel Vera*
 
-## 📞 Soporte
+## 📞 Soporte 0000.00000.00000
 
 Para soporte y preguntas, por favor crear un issue en el repositorio.
 
