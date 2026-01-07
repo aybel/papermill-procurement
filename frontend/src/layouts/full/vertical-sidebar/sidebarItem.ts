@@ -38,7 +38,7 @@ const sidebarItem: menu[] = [
     {
         title: 'Dashboard',
         icon: LayoutDashboardIcon,
-        to: '/',
+        to: '/home',
         external: false
     },
 
@@ -157,6 +157,29 @@ const sidebarItem: menu[] = [
                 title: 'Inventario',
                 icon: PointIcon,
                 to: '/reports/inventory',
+                external: false
+            }
+        ]
+    },
+    {
+        header:'Usuarios'
+    },
+    {
+        title: 'Gestión de Usuarios',
+        icon: UsersIcon,
+        to: '#',
+        external: false,
+        children: [
+            {
+                title: 'Autorizar Usuarios',  
+                icon: UsersIcon,
+                to: '/users',
+                external: false
+            },
+            {
+                title: 'Roles',
+                icon: ShieldCheckIcon,
+                to: '/roles',
                 external: false
             }
         ]

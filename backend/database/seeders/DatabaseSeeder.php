@@ -15,7 +15,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-        $this->call(PermissionsSeeder::class);
+        $this->call([
+            // 1. Catálogos de los que dependen los proveedores
+            SupplierTypeSeeder::class,
+            SupplierStatusSeeder::class,
+            PaymentTermSeeder::class,
+            CurrencySeeder::class,
+
+            // 2. Proveedores (aún sin el contacto primario)
+            SupplierSeeder::class,
+
+            // 3. Contactos (que se asocian a proveedores y actualizan el ID primario)
+            SupplierContactSeeder::class,
+
+            // 4. Permisos y otros seeders
+            PermissionsSeeder::class,
+        ]);
     }
 }

@@ -31,7 +31,7 @@ return new class extends Migration
 
             // Información adicional
             $table->string('notes', 500)->nullable()->comment('Notas o comentarios adicionales sobre el proveedor');
-
+            $table->boolean('active')->default(1)->comment('Indica si el proveedor está activo o inactivo');
             $table->timestamps();
             $table->softDeletes();
 

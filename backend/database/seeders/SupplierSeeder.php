@@ -27,6 +27,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 1, // USD
                 'credit_limit' => 500000.00,
                 'notes' => 'Proveedor principal de celulosa kraft blanqueada',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -43,6 +44,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 3, // MXN
                 'credit_limit' => 300000.00,
                 'notes' => 'Proveedor regional de pulpa mecánica',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -59,6 +61,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 3, // MXN
                 'credit_limit' => 150000.00,
                 'notes' => 'Especialista en papel reciclado de alta calidad',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -75,6 +78,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 2, // EUR
                 'credit_limit' => 750000.00,
                 'notes' => 'Proveedor premium de celulosa de eucalipto',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -93,6 +97,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 3, // MXN
                 'credit_limit' => 100000.00,
                 'notes' => 'Proveedor de cajas corrugadas y tarimas',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -109,6 +114,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 1, // USD
                 'credit_limit' => 80000.00,
                 'notes' => 'Especialista en film stretch y plásticos industriales',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -127,6 +133,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 1, // USD
                 'credit_limit' => 400000.00,
                 'notes' => 'Proveedor de blanqueadores y agentes de reforzamiento',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -143,6 +150,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 1, // USD
                 'credit_limit' => 250000.00,
                 'notes' => 'Colorantes y aditivos para papel tissue y cartón',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -159,6 +167,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 3, // MXN
                 'credit_limit' => 50000.00,
                 'notes' => 'Proveedor suspendido por problemas de calidad',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -177,6 +186,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 3, // MXN
                 'credit_limit' => 200000.00,
                 'notes' => 'Transporte especializado en materiales químicos',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -193,6 +203,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 3, // MXN
                 'credit_limit' => 100000.00,
                 'notes' => 'Mantenimiento preventivo y correctivo de maquinaria',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -209,6 +220,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 1, // USD
                 'credit_limit' => 150000.00,
                 'notes' => 'Certificaciones ambientales y tratamiento de aguas',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -227,6 +239,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 2, // EUR
                 'credit_limit' => 2000000.00,
                 'notes' => 'Equipos de producción y máquinas papeleras Voith',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -243,6 +256,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 1, // USD
                 'credit_limit' => 500000.00,
                 'notes' => 'Repuestos originales y genéricos para maquinaria',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -259,6 +273,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 1, // USD
                 'credit_limit' => 800000.00,
                 'notes' => 'Sistemas SCADA y sensores industriales',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -277,6 +292,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 3, // MXN
                 'credit_limit' => 120000.00,
                 'notes' => 'Almidones modificados y adhesivos biodegradables',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -293,6 +309,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 3, // MXN
                 'credit_limit' => 600000.00,
                 'notes' => 'Gas natural y combustibles para calderas',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -309,6 +326,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 1, // USD
                 'credit_limit' => 180000.00,
                 'notes' => 'Bobinas industriales y cores de cartón',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -325,6 +343,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 3, // MXN
                 'credit_limit' => 80000.00,
                 'notes' => 'Análisis físico-químicos y certificaciones',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -341,6 +360,7 @@ class SupplierSeeder extends Seeder
                 'currency_id' => 1, // USD
                 'credit_limit' => null,
                 'notes' => 'Proveedor inactivo - pendiente de reactivación',
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

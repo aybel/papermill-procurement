@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\SupplierRepositoryInterface;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -36,7 +37,7 @@ class SupplierController extends Controller
 
             $perPage = $request->input('per_page', 15);
             $suppliers = $this->supplierRepository->getAllPaginated($filters, $perPage);
-
+            //Log::info('Suppliers fetched', ['count' => count($suppliers->items())]);
             return response()->json([
                 'success' => true,
                 'data' => $suppliers,

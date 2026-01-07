@@ -7,7 +7,7 @@ const MainRoutes = {
   component: () => import("@/layouts/full/FullLayout.vue"),
   children: [
     {
-      path: "",
+      path: "home",
       name: "Home",
       component: () => import("@/views/Home.vue"),
     },
@@ -16,16 +16,16 @@ const MainRoutes = {
     {
       path: "suppliers",
       name: "Suppliers",
-      component: () => import("@/views/Home.vue"),
+      component: () => import("@/views/suppliers/index.vue"),
     },
     {
       path: "suppliers/create",
-      name: "SupplierCreate",
+      name: "CreateSupplier",
       component: () => import("@/views/Home.vue"),
     },
     {
       path: "suppliers/:id/edit",
-      name: "SupplierEdit",
+      name: "EditSupplier",
       component: () => import("@/views/Home.vue"),
     },
     {
