@@ -27,7 +27,7 @@ return new class extends Migration
             // Información financiera
             $table->foreignId('payment_terms_id')->default(3)->constrained('payment_terms')->comment('FK: Términos de pago del proveedor (ref: payment_terms.id)');
             $table->foreignId('currency_id')->default(1)->constrained('currencies')->comment('FK: Moneda de operación del proveedor (ref: currencies.id)');
-            $table->decimal('credit_limit', 15, 2)->nullable()->comment('Límite de crédito autorizado');
+            $table->decimal('credit_limit', 15, 2)->default(0.00)->nullable()->comment('Límite de crédito autorizado');
 
             // Información adicional
             $table->string('notes', 500)->nullable()->comment('Notas o comentarios adicionales sobre el proveedor');
