@@ -20,19 +20,18 @@ Route::prefix('v1')->group(function () {
             return $request->user();
         });
 
-        // Rutas de proveedores (protegidas)
+        // Rutas de proveedores (ahora públicas temporalmente)
         Route::prefix('suppliers')->group(function () {
-            Route::get('/active', [SupplierController::class, 'active'])->middleware('permission:suppliers.view_any');
-            Route::get('/search', [SupplierController::class, 'search'])->middleware('permission:suppliers.view_any');
-            Route::get('/', [SupplierController::class, 'index'])->middleware('permission:suppliers.view_any');
-            Route::get('/{id}', [SupplierController::class, 'show'])->middleware('permission:suppliers.view');
-            Route::post('/', [SupplierController::class, 'store'])->middleware('permission:suppliers.create');
-            Route::put('/{id}', [SupplierController::class, 'update'])->middleware('permission:suppliers.update');
-            Route::delete('/{id}', [SupplierController::class, 'destroy'])->middleware('permission:suppliers.delete');
-            Route::post('/{id}/restore', [SupplierController::class, 'restore'])->middleware('permission:suppliers.restore');
-            Route::patch('/{id}/scores', [SupplierController::class, 'updateScores'])->middleware('permission:suppliers.update_scores');
+            Route::get('/active', [SupplierController::class, 'active']);
+            Route::get('/search', [SupplierController::class, 'search']);
+            Route::get('/', [SupplierController::class, 'index']);
+            Route::get('/{id}', [SupplierController::class, 'show']);
+            Route::post('/', [SupplierController::class, 'store']);
+            Route::put('/{id}', [SupplierController::class, 'update']);
+            Route::delete('/{id}', [SupplierController::class, 'destroy']);
+            Route::post('/{id}/restore', [SupplierController::class, 'restore']);
+            Route::patch('/{id}/scores', [SupplierController::class, 'updateScores']);
         });
-
         // Rutas para Roles y Permisos (protegidas)
         Route::middleware('permission:roles.manage')->group(function () {
             Route::get('/permissions', [PermissionController::class, 'index']);

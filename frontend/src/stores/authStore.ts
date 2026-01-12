@@ -35,7 +35,7 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async login(email: string, password: string) {
       try {
-        const response = await apiClient.post("/auth/login", {
+        const response = await apiClient.post("v1/auth/login", {
           email,
           password,
         });
@@ -60,7 +60,7 @@ export const useAuthStore = defineStore("auth", {
     async fetchUser() {
       if (this.token) {
         try {
-          const response = await apiClient.get("/auth/me");
+          const response = await apiClient.get("v1/auth/me");
           const { user, roles, permissions } = response.data;
 
           // Guardar los datos del usuario en el estado y en localStorage

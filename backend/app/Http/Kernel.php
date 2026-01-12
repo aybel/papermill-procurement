@@ -8,6 +8,7 @@ class Kernel extends HttpKernel
 {
     protected $middleware = [
         \App\Http\Middleware\TrustProxies::class,
+        \Fruitcake\Cors\HandleCors::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
@@ -29,10 +30,14 @@ class Kernel extends HttpKernel
         ],
     ];
 
-    protected $routeMiddleware = [
-        'auth' => \App\Http\Middleware\Authenticate::class,
-        'auth:api' => \App\Http\Middleware\Authenticate::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
-    ];
+    /**
+     * Register the application's route middleware aliases.
+     */
+    protected function configureMiddleware($middleware)
+    {
+        $middleware->alias('auth', \App\Http\Middleware\Authenticate::class);
+        $middleware->alias('auth:api', \App\Http\Middleware\Authenticate::class);
+        $middleware->alias('throttle', \Illuminate\Routing\Middleware\ThrottleRequests::class);
+        $middleware->alias('bindings', \Illuminate\Routing\Middleware\SubstituteBindings::class);
+    }
 }

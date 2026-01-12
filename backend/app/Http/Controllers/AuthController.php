@@ -40,7 +40,7 @@ class AuthController extends Controller
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user) {
-            //Log::error("LOGIN FAIL: Usuario no encontrado con email: " . $credentials['email']);
+            Log::error("LOGIN FAIL: Usuario no encontrado con email: " . $credentials['email']);
             return response()->json(['error' => 'Usuario no existe'], 404);
         }
 
@@ -62,7 +62,7 @@ class AuthController extends Controller
 
         // 3. Intento oficial con el guard
         if (! $token = Auth::guard('api')->attempt($credentials)) {
-            //Log::error("LOGIN FAIL: El guard 'api' retornó false, aunque las credenciales podrían ser válidas.");
+            Log::error("LOGIN FAIL: El guard 'api' retornó false, aunque las credenciales podrían ser válidas.");
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prueba Login CORS</title>
+</head>
+<body>
+  <h2>Prueba de login CORS (fetch)</h2>
+  <form id="loginForm">
+    <label>Email: <input type="email" id="email" value="test@example.com" required></label><br>
+    <label>Password: <input type="password" id="password" value="test123" required></label><br>
+    <button type="submit">Login</button>
+  </form>
+  <pre id="result"></pre>
+  <script>
+    document.getElementById('loginForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      document.getElementById('result').textContent = 'Cargando...';
+      try {
+        const res = await fetch('http://localhost:8088/api/v1/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+        const text = await res.text();
+        document.getElementById('result').textContent = `Status: ${res.status}\nHeaders: ${JSON.stringify([...res.headers])}\nBody: ${text}`;
+      } catch (err) {
+        document.getElementById('result').textContent = 'Error: ' + err;
+      }
+    };
+  </script>
+</body>
+</html>

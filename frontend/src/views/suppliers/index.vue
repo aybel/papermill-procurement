@@ -25,8 +25,15 @@ const loadSuppliers = async () => {
     try {
         const response = await supplierService.getAll();
         suppliers.value = response.data || response;
-    } catch (error) {
-        console.error('Error al cargar proveedores:', error);
+    } catch (error: any) {
+        let message = 'Error al cargar proveedores';
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            message = 'Sesión expirada o sin permisos. Por favor, inicia sesión nuevamente.';
+            // Redirigir al login
+            window.location.href = '/login';
+        }
+        alert(message);
+        console.error(message, error);
     } finally {
         loading.value = false;
     }
@@ -76,44 +83,19 @@ onMounted(() => {
         <v-card-text>
             <v-row class="mb-4">
                 <v-col cols="12" md="4">
-                    <v-text-field
-                        v-model="search"
-                        prepend-inner-icon="mdi-magnify"
-                        label="Buscar proveedor"
-                        variant="outlined"
-                        density="compact"
-                        hide-details
-                    />
+                    <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Buscar proveedor"
+                        variant="outlined" density="compact" hide-details />
                 </v-col>
             </v-row>
 
-            <v-data-table
-                :headers="headers"
-                :items="suppliers"
-                :search="search"
-                :loading="loading"
-                :items-per-page="10"
-                class="elevation-1"
-                loading-text="Cargando proveedores..."
-                no-data-text="No hay proveedores registrados"
-            >
+            <v-data-table :headers="headers" :items="suppliers" :search="search" :loading="loading" :items-per-page="10"
+                class="elevation-1" loading-text="Cargando proveedores..."
+                no-data-text="No hay proveedores registrados">
                 <template v-slot:item.actions="{ item }">
-                    <v-btn
-                        icon
-                        size="small"
-                        variant="text"
-                        color="primary"
-                        @click="handleEdit(item)"
-                    >
+                    <v-btn icon size="small" variant="text" color="primary" @click="handleEdit(item)">
                         <PencilIcon size="20" />
                     </v-btn>
-                    <v-btn
-                        icon
-                        size="small"
-                        variant="text"
-                        color="error"
-                        @click="handleDelete(item)"
-                    >
+                    <v-btn icon size="small" variant="text" color="error" @click="handleDelete(item)">
                         <TrashIcon size="20" />
                     </v-btn>
                 </template>
