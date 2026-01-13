@@ -29,4 +29,11 @@ class SupplierStatus extends Model
     {
         return $this->hasMany(Supplier::class);
     }
+    /**
+     * Scope para filtrar estados activos
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

@@ -40,4 +40,12 @@ class Currency extends Model
     {
         return $this->hasMany(Material::class);
     }
+
+    /**
+     * Scope para filtrar solo monedas activas
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

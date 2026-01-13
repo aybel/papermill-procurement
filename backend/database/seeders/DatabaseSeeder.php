@@ -30,6 +30,9 @@ class DatabaseSeeder extends Seeder
 
             // 4. Permisos y otros seeders
             PermissionsSeeder::class,
+            PapermillPermissionsSeeder::class,
+            AssignPapermillPermissionsSeeder::class,
+            AssignPapermillPermissionsToRoleSeeder::class,
         ]);
     }
 }

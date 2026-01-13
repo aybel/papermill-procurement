@@ -28,4 +28,11 @@ class SupplierType extends Model
     {
         return $this->hasMany(Supplier::class);
     }
+    /**
+     * Scope para filtrar tipos activos
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

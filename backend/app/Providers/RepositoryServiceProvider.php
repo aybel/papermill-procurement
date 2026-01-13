@@ -17,6 +17,26 @@ class RepositoryServiceProvider extends ServiceProvider
             SupplierRepositoryInterface::class,
             SupplierRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\CurrencyRepositoryInterface::class,
+            \App\Repositories\CurrencyRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\PaymentTermRepositoryInterface::class,
+            \App\Repositories\PaymentTermRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\SupplierContactRepositoryInterface::class,
+            \App\Repositories\SupplierContactRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\SupplierStatusRepositoryInterface::class,
+            \App\Repositories\SupplierStatusRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\SupplierTypeRepositoryInterface::class,
+            \App\Repositories\SupplierTypeRepository::class
+        );
     }
 
     /**
