@@ -120,7 +120,6 @@ class SupplierController extends Controller
                 'tax_id' => 'nullable|string|max:20',
                 'supplier_type_id' => 'nullable|exists:supplier_types,id',
                 'supplier_status_id' => 'required|exists:supplier_statuses,id',
-                'primary_contact_id' => 'nullable|exists:supplier_contacts,id',
                 'quality_score' => 'nullable|numeric|min:0|max:1',
                 'delivery_score' => 'nullable|numeric|min:0|max:1',
                 'payment_terms_id' => 'required|exists:payment_terms,id',
