@@ -36,6 +36,11 @@ RUN apk add --no-cache $PHPIZE_DEPS && \
     pecl install redis && \
     docker-php-ext-enable redis
 
+# Install Swoole extension for Laravel Octane
+RUN apk add --no-cache $PHPIZE_DEPS && \
+    pecl install swoole && \
+    docker-php-ext-enable swoole
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

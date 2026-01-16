@@ -20,6 +20,9 @@ services:
       - JWT_SECRET=W586o9EAXzoyMNdlbcnfe4qd2a0ZQqehWc1EXCsxduaKqHWY1ocw7p6LsBFe4ESV
     depends_on:
       - mysql
+    command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8000
+    ports:
+      - "8000:8000"
 
   nginx:
     image: nginx:1.25
