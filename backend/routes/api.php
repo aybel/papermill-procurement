@@ -122,6 +122,10 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('roles', RoleController::class);
         });
 
+        // Endpoint único para exportar reportes
+        Route::post('/reports/export', [\App\Http\Controllers\ReportController::class, 'export'])
+            ->middleware('permission:reports.export');
+
         // Asignar roles a usuarios
         Route::post('/users/{user}/roles', [RoleController::class, 'assignRoleToUser'])
             ->middleware('permission:users.manage');
