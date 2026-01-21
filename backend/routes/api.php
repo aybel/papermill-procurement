@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PermissionController;
@@ -123,7 +124,7 @@ Route::prefix('v1')->group(function () {
         });
 
         // Endpoint único para exportar reportes
-        Route::post('/reports/export', [\App\Http\Controllers\ReportController::class, 'export'])
+        Route::post('/reports/export', [ReportController::class, 'export'])
             ->middleware('permission:reports.export');
 
         // Asignar roles a usuarios

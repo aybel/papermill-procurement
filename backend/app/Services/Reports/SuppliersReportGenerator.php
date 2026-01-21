@@ -2,10 +2,11 @@
 
 namespace App\Services\Reports;
 
-use App\Repositories\SupplierRepositoryInterface;
+use TCPDF;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
-use TCPDF;
+use App\Repositories\SupplierRepositoryInterface;
 
 class SuppliersReportGenerator implements ReportGeneratorInterface
 {
@@ -14,11 +15,13 @@ class SuppliersReportGenerator implements ReportGeneratorInterface
     public function __construct(SupplierRepositoryInterface $supplierRepository)
     {
         $this->supplierRepository = $supplierRepository;
+        \Log::info('SuppliersReportGenerator: constructor ejecutado');
     }
 
     public function generate(array $filters, string $format)
     {
         $data = $this->getData($filters);
+        \Log::info('SuppliersReportGenerator: total proveedores', ['count' => count($data)]);
         if ($format === 'excel') {
             return $this->generateExcel($data);
         } elseif ($format === 'pdf') {
@@ -66,6 +69,7 @@ class SuppliersReportGenerator implements ReportGeneratorInterface
             $html .= '<tr><td>' . $s->id . '</td><td>' . $s->name . '</td><td>' . $s->rfc . '</td><td>' . $s->email . '</td></tr>';
         }
         $html .= '</table>';
+        \Log::info('SuppliersReportGenerator: HTML PDF', ['html' => $html]);
         $pdf->writeHTML($html, true, false, true, false, '');
         $filename = storage_path('app/suppliers_report_' . now()->format('Ymd_His') . '.pdf');
         $pdf->Output($filename, 'F');
