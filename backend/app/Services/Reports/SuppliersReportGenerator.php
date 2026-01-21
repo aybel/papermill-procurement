@@ -2,7 +2,7 @@
 
 namespace App\Services\Reports;
 
-use TCPDF;
+use App\Services\Reports\Base\BasePdfReport;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
@@ -15,13 +15,11 @@ class SuppliersReportGenerator implements ReportGeneratorInterface
     public function __construct(SupplierRepositoryInterface $supplierRepository)
     {
         $this->supplierRepository = $supplierRepository;
-        \Log::info('SuppliersReportGenerator: constructor ejecutado');
     }
 
     public function generate(array $filters, string $format)
     {
         $data = $this->getData($filters);
-        \Log::info('SuppliersReportGenerator: total proveedores', ['count' => count($data)]);
         if ($format === 'excel') {
             return $this->generateExcel($data);
         } elseif ($format === 'pdf') {
@@ -61,18 +59,50 @@ class SuppliersReportGenerator implements ReportGeneratorInterface
 
     protected function generatePdf($suppliers)
     {
-        // Implementación básica usando TCPDF
-        $pdf = new TCPDF();
+        // Usar la clase base personalizada
+        $pdf = new BasePdfReport('L', 'mm', 'A4');
+        // Definir encabezados y configuración de tabla ANTES de AddPage
+        $pdf->arrayColumns = ['ID', 'Código', 'Nombre', 'RFC', 'Tipo', 'Estatus', 'Moneda', 'Límite', 'Score'];
+        $pdf->arrayWidths = [12, 22, 65, 30, 30, 25, 25, 35, 40];
+        $pdf->heightRow = 8;
+        $widths = $pdf->arrayWidths;
+        // set document information
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor('Papermill-ERP');
+        $pdf->SetTitle('TCPDF Example 003');
+        $pdf->SetSubject('TCPDF Tutorial');
+        $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_HEADER);
+        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        // Contenido del reporte
         $pdf->AddPage();
-        $html = '<h1>Reporte de Proveedores</h1><table border="1" cellpadding="4"><tr><th>ID</th><th>Nombre</th><th>RFC</th><th>Email</th></tr>';
+        // Ya no es necesario setear Y manualmente, el Header y drawTableHeader lo controlan
+        $pdf->SetFont('helvetica', '', 10);
+        $pdf->SetFillColor(230, 230, 230);
+        // Datos
         foreach ($suppliers as $s) {
-            $html .= '<tr><td>' . $s->id . '</td><td>' . $s->name . '</td><td>' . $s->rfc . '</td><td>' . $s->email . '</td></tr>';
+            $pdf->Row([
+                $s->id,
+                $s->code ?? '',
+                $s->name ?? '',
+                $s->tax_id ?? '',
+                optional($s->supplierType)->name ?? '',
+                optional($s->supplierStatus)->name ?? '',
+                optional($s->currency)->code ?? '',
+                $s->credit_limit ?? '',
+                $s->overall_score ?? ''
+            ], $widths, 8);
         }
-        $html .= '</table>';
-        \Log::info('SuppliersReportGenerator: HTML PDF', ['html' => $html]);
-        $pdf->writeHTML($html, true, false, true, false, '');
         $filename = storage_path('app/suppliers_report_' . now()->format('Ymd_His') . '.pdf');
         $pdf->Output($filename, 'F');
-        return $filename;
+        // Leer el contenido antes de borrar
+        $content = file_get_contents($filename);
+        // Eliminar el archivo generado
+        @unlink($filename);
+        // Guardar el archivo temporalmente para la respuesta (puedes devolver el contenido o un stream)
+        $tmpPath = tempnam(sys_get_temp_dir(), 'report_') . '.pdf';
+        file_put_contents($tmpPath, $content);
+        return $tmpPath;
     }
 }

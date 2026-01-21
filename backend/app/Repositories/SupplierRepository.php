@@ -61,6 +61,8 @@ class SupplierRepository implements SupplierRepositoryInterface
         $query = $this->model->with([
             'supplierType',
             'supplierStatus',
+            'primaryContact',
+            'paymentTerms',
             'currency'
         ]);
 
