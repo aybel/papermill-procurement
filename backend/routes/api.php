@@ -1,5 +1,3 @@
-// CRUD Materials
-Route::apiResource('materials', MaterialController::class);
 <?php
 
 use Illuminate\Http\Request;
@@ -90,8 +88,7 @@ Route::prefix('v1')->group(function () {
                 ->middleware('permission:supplier_contacts.update');
             Route::delete('/{id}', [SupplierContactController::class, 'destroy'])
                 ->middleware('permission:supplier_contacts.delete');
-            Route::get('/search', [SupplierContactController::class, 'search'])
-                ->middleware('permission:supplier_contacts.view_any');
+            Route::get('/search', [SupplierContactController::class, 'search']);
         });
 
         // CRUD para supplier_statuses

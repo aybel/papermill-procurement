@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\SupplierContact;
+use Illuminate\Support\Facades\Log;
 
 class SupplierContactRepository implements SupplierContactRepositoryInterface
 {
@@ -38,7 +39,7 @@ class SupplierContactRepository implements SupplierContactRepositoryInterface
     public function search(array $params)
     {
         $query = SupplierContact::query();
-
+        Log::info('Search params: ' . json_encode($params));
         if (!empty($params['supplier_id'])) {
             $query->where('supplier_id', $params['supplier_id']);
         }

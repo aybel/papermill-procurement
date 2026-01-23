@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\SupplierContactRequest;
 use Illuminate\Http\JsonResponse;
 use App\Repositories\SupplierContactRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 
 class SupplierContactController extends Controller
 {
@@ -68,10 +69,21 @@ class SupplierContactController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $supplierContacts = $this->supplierContactRepository->search($request->all());
-        return response()->json([
-            'success' => true,
-            'data' => $supplierContacts,
-        ]);
+        try {
+            Log::info('Supplier contacts search');
+            $supplierContacts = $this->supplierContactRepository->search($request->all());
+            return response()->json([
+                'success' => true,
+                'data' => $supplierContacts,
+            ]);
+        } catch (\Exception $e) {
+            Log::info('Supplier contacts search caught exception: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontraron contactos para el proveedor solicitado o hubo un error.',
+                'error' => $e->getMessage(),
+                'data' => [],
+            ], 200);
+        }
     }
 }

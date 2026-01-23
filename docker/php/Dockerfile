@@ -35,9 +35,9 @@ RUN apk add --no-cache $PHPIZE_DEPS && \
     docker-php-ext-enable redis
 
 # Install Swoole extension for Laravel Octane
-RUN apk add --no-cache $PHPIZE_DEPS && \
-    pecl install swoole && \
-    docker-php-ext-enable swoole
+#RUN apk add --no-cache $PHPIZE_DEPS && \
+ #   pecl install swoole && \
+  #  docker-php-ext-enable swoole
 
 # Install Xdebug
 USER root
@@ -45,7 +45,7 @@ RUN apk add --no-cache linux-headers nodejs npm
 RUN mkdir -p /tmp/pear/download && chmod -R 777 /tmp/pear
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 # Instala chokidar globalmente para Laravel Octane
-RUN npm install -g chokidar
+# RUN npm install -g chokidar
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
