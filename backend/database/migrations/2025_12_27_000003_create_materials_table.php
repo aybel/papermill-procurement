@@ -19,7 +19,7 @@ return new class extends Migration
 
             // Clasificación
             $table->foreignId('category_id')->nullable()->constrained('material_categories')->comment('FK: Categoría del material (ref: material_categories.id)');
-            $table->string('material_type', 50)->nullable()->comment('Tipo de material (raw_material, chemical, packaging, etc.)');
+            $table->foreignId('material_type_id')->constrained('material_types')->comment('FK: Tipo de material (ref: material_types.id)');
             $table->string('unit_of_measure', 20)->comment('Unidad de medida (kg, ton, rollo, litro, etc.)');
 
             // Gestión de inventario

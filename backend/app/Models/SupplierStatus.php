@@ -15,11 +15,11 @@ class SupplierStatus extends Model
         'code',
         'color',
         'description',
-        'is_active',
+        'active',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'active' => 'boolean',
     ];
 
     /**
@@ -34,6 +34,6 @@ class SupplierStatus extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('active', true);
     }
 }

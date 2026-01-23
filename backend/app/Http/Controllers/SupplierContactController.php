@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\SupplierContactRequest;
-
+use Illuminate\Http\JsonResponse;
 use App\Repositories\SupplierContactRepositoryInterface;
 
 class SupplierContactController extends Controller
@@ -18,7 +18,7 @@ class SupplierContactController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $items = $this->supplierContactRepository->search($request->all());
         return response()->json($items);
@@ -27,7 +27,7 @@ class SupplierContactController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(SupplierContactRequest $request)
+    public function store(SupplierContactRequest $request): JsonResponse
     {
         $item = $this->supplierContactRepository->create($request->validated());
         return response()->json($item, 201);
@@ -36,7 +36,7 @@ class SupplierContactController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
         $item = $this->supplierContactRepository->find($id);
         return response()->json($item);
@@ -45,7 +45,7 @@ class SupplierContactController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(SupplierContactRequest $request, string $id)
+    public function update(SupplierContactRequest $request, string $id): JsonResponse
     {
         $item = $this->supplierContactRepository->update($id, $request->validated());
         return response()->json($item);
@@ -54,9 +54,24 @@ class SupplierContactController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
         $this->supplierContactRepository->delete($id);
         return response()->json(null, 204);
+    }
+
+    /**
+     * Buscar contactos de proveedores por id de proveedor
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $supplierContacts = $this->supplierContactRepository->search($request->all());
+        return response()->json([
+            'success' => true,
+            'data' => $supplierContacts,
+        ]);
     }
 }

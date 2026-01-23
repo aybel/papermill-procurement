@@ -20,13 +20,14 @@ return new class extends Migration
             $table->string('mobile', 20)->nullable()->comment('Celular del contacto');
             $table->string('position', 100)->nullable()->comment('Cargo o posición del contacto');
             $table->string('department', 100)->nullable()->comment('Departamento del contacto (ventas, compras, etc.)');
-            $table->boolean('is_primary')->default(false)->comment('Indica si es el contacto principal');
-            $table->boolean('is_active')->default(true)->comment('Indica si el contacto está activo');
+            $table->boolean('primary')->default(false)->comment('Indica si es el contacto principal');
+            $table->boolean('active')->default(true)->comment('Indica si el contacto está activo');
             $table->text('notes')->nullable()->comment('Notas adicionales sobre el contacto');
             $table->timestamps();
 
             $table->index('supplier_id', 'idx_supplier_contacts_supplier');
-            $table->index('is_primary', 'idx_supplier_contacts_primary');
+            $table->index('primary', 'idx_supplier_contacts_primary');
+            // Si existía un índice para is_active, actualizarlo a active si es necesario
         });
     }
 

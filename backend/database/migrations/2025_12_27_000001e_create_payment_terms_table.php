@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('name', 100)->comment('Nombre descriptivo del término');
             $table->integer('days')->comment('Número de días para el pago');
             $table->text('description')->nullable()->comment('Descripción detallada del término de pago');
-            $table->boolean('is_active')->default(true)->comment('Indica si el término está activo');
+            $table->boolean('active')->default(true)->comment('Indica si el término está activo');
             $table->timestamps();
 
-            $table->index('is_active', 'idx_payment_terms_active');
+            $table->index('active', 'idx_payment_terms_active');
         });
 
         // Insertar términos de pago comunes
@@ -31,7 +31,7 @@ return new class extends Migration
                 'name' => 'Pago Inmediato',
                 'days' => 0,
                 'description' => 'Pago al recibir la mercancía',
-                'is_active' => true,
+                'active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -40,7 +40,7 @@ return new class extends Migration
                 'name' => 'Neto 15 días',
                 'days' => 15,
                 'description' => 'Pago a 15 días después de la factura',
-                'is_active' => true,
+                'active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -49,7 +49,7 @@ return new class extends Migration
                 'name' => 'Neto 30 días',
                 'days' => 30,
                 'description' => 'Pago a 30 días después de la factura',
-                'is_active' => true,
+                'active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -58,7 +58,7 @@ return new class extends Migration
                 'name' => 'Neto 45 días',
                 'days' => 45,
                 'description' => 'Pago a 45 días después de la factura',
-                'is_active' => true,
+                'active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -67,7 +67,7 @@ return new class extends Migration
                 'name' => 'Neto 60 días',
                 'days' => 60,
                 'description' => 'Pago a 60 días después de la factura',
-                'is_active' => true,
+                'active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -76,7 +76,7 @@ return new class extends Migration
                 'name' => 'Neto 90 días',
                 'days' => 90,
                 'description' => 'Pago a 90 días después de la factura',
-                'is_active' => true,
+                'active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

@@ -38,6 +38,10 @@ class SupplierContactRepository implements SupplierContactRepositoryInterface
     public function search(array $params)
     {
         $query = SupplierContact::query();
+
+        if (!empty($params['supplier_id'])) {
+            $query->where('supplier_id', $params['supplier_id']);
+        }
         if (!empty($params['name'])) {
             $query->where('name', 'like', '%' . $params['name'] . '%');
         }

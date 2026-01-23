@@ -14,8 +14,6 @@ RUN apk add --no-cache \
     libzip-dev \
     oniguruma-dev \
     icu-dev \
-    nodejs \
-    npm \
     supervisor
 
 # Install PHP extensions
@@ -40,6 +38,14 @@ RUN apk add --no-cache $PHPIZE_DEPS && \
 RUN apk add --no-cache $PHPIZE_DEPS && \
     pecl install swoole && \
     docker-php-ext-enable swoole
+
+# Install Xdebug
+USER root
+RUN apk add --no-cache linux-headers nodejs npm
+RUN mkdir -p /tmp/pear/download && chmod -R 777 /tmp/pear
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+# Instala chokidar globalmente para Laravel Octane
+RUN npm install -g chokidar
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -67,4 +73,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD php-fpm -t || exit 1
 
 CMD ["php-fpm"]
+
 

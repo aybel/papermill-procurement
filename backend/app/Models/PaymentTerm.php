@@ -20,7 +20,7 @@ class PaymentTerm extends Model
 
     protected $casts = [
         'days' => 'integer',
-        'is_active' => 'boolean',
+        'active' => 'boolean',
     ];
 
     /**

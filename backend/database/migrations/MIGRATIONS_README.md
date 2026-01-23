@@ -229,13 +229,13 @@ class SupplierContact extends Model
         'position',
         'department',
         'is_primary',
-        'is_active',
+        'active',
         'notes',
     ];
 
     protected $casts = [
         'is_primary' => 'boolean',
-        'is_active' => 'boolean',
+        'active' => 'boolean',
     ];
 
     public function supplier()
@@ -256,10 +256,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class SupplierType extends Model
 {
-    protected $fillable = ['code', 'name', 'description', 'is_active'];
+    protected $fillable = ['code', 'name', 'description', 'active'];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'active' => 'boolean',
     ];
 
     public function suppliers()
@@ -270,10 +270,10 @@ class SupplierType extends Model
 
 class SupplierStatus extends Model
 {
-    protected $fillable = ['code', 'name', 'description', 'color', 'is_active'];
+    protected $fillable = ['code', 'name', 'description', 'color', 'active'];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'active' => 'boolean',
     ];
 
     public function suppliers()

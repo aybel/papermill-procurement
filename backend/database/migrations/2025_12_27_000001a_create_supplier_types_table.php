@@ -17,17 +17,17 @@ return new class extends Migration
             $table->string('code', 50)->unique()->comment('Código único del tipo (raw_material, packaging, etc.)');
             $table->string('name', 100)->comment('Nombre descriptivo del tipo de proveedor');
             $table->string('description', 255)->nullable()->comment('Descripción detallada del tipo');
-            $table->boolean('is_active')->default(true)->comment('Indica si el tipo está activo y disponible');
+            $table->boolean('active')->default(true)->comment('Indica si el tipo está activo y disponible');
             $table->timestamps();
         });
 
         // Insertar tipos iniciales
         DB::table('supplier_types')->insert([
-            ['code' => 'raw_material', 'name' => 'Materia Prima', 'description' => 'Proveedores de materia prima', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['code' => 'packaging', 'name' => 'Empaque', 'description' => 'Proveedores de materiales de empaque', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['code' => 'chemical', 'name' => 'Químicos', 'description' => 'Proveedores de productos químicos', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['code' => 'service', 'name' => 'Servicios', 'description' => 'Proveedores de servicios', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['code' => 'equipment', 'name' => 'Equipamiento', 'description' => 'Proveedores de equipos y maquinaria', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['code' => 'raw_material', 'name' => 'Materia Prima', 'description' => 'Proveedores de materia prima', 'active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['code' => 'packaging', 'name' => 'Empaque', 'description' => 'Proveedores de materiales de empaque', 'active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['code' => 'chemical', 'name' => 'Químicos', 'description' => 'Proveedores de productos químicos', 'active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['code' => 'service', 'name' => 'Servicios', 'description' => 'Proveedores de servicios', 'active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['code' => 'equipment', 'name' => 'Equipamiento', 'description' => 'Proveedores de equipos y maquinaria', 'active' => true, 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 

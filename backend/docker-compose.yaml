@@ -23,6 +23,8 @@ services:
     command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8000 --watch
     ports:
       - "8000:8000"
+      - "9003:9003"
+      - "9003:9003"  # Xdebug port
 
   nginx:
     image: nginx:1.25

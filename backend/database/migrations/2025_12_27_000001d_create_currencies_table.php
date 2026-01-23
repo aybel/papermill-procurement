@@ -19,10 +19,10 @@ return new class extends Migration
             $table->string('symbol', 10)->comment('Símbolo de la moneda ($, €, etc.)');
             $table->decimal('exchange_rate', 12, 6)->default(1.000000)->comment('Tipo de cambio respecto a la moneda base');
             $table->boolean('is_base')->default(false)->comment('Indica si es la moneda base del sistema');
-            $table->boolean('is_active')->default(true)->comment('Indica si la moneda está activa');
+            $table->boolean('active')->default(true)->comment('Indica si la moneda está activa');
             $table->timestamps();
 
-            $table->index('is_active', 'idx_currencies_active');
+            $table->index('active', 'idx_currencies_active');
         });
 
         // Insertar monedas comunes
@@ -33,7 +33,7 @@ return new class extends Migration
                 'symbol' => '$',
                 'exchange_rate' => 1.000000,
                 'is_base' => true,
-                'is_active' => true,
+                'active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -43,7 +43,7 @@ return new class extends Migration
                 'symbol' => '€',
                 'exchange_rate' => 1.100000,
                 'is_base' => false,
-                'is_active' => true,
+                'active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -53,7 +53,7 @@ return new class extends Migration
                 'symbol' => '$',
                 'exchange_rate' => 0.050000,
                 'is_base' => false,
-                'is_active' => true,
+                'active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

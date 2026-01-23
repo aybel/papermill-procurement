@@ -33,6 +33,9 @@ class DatabaseSeeder extends Seeder
             PapermillPermissionsSeeder::class,
             AssignPapermillPermissionsSeeder::class,
             AssignPapermillPermissionsToRoleSeeder::class,
+            MaterialTypeSeeder::class,
+            MaterialCategorySeeder::class,
+            MaterialSeeder::class,
         ]);
     }
 }

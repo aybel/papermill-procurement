@@ -37,6 +37,10 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\SupplierTypeRepositoryInterface::class,
             \App\Repositories\SupplierTypeRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\MaterialRepositoryInterface::class,
+            \App\Repositories\MaterialRepository::class
+        );
     }
 
     /**

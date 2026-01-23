@@ -16,13 +16,13 @@ class Currency extends Model
         'symbol',
         'exchange_rate',
         'is_base',
-        'is_active',
+        'active',
     ];
 
     protected $casts = [
         'exchange_rate' => 'decimal:6',
         'is_base' => 'boolean',
-        'is_active' => 'boolean',
+        'active' => 'boolean',
     ];
 
     /**

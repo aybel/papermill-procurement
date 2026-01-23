@@ -18,14 +18,14 @@ class SupplierContact extends Model
         'mobile',
         'position',
         'department',
-        'is_primary',
-        'is_active',
+        'primary',
+        'active',
         'notes',
     ];
 
     protected $casts = [
-        'is_primary' => 'boolean',
-        'is_active' => 'boolean',
+        'primary' => 'boolean',
+        'active' => 'boolean',
     ];
 
     /**
