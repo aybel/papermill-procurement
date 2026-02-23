@@ -21,10 +21,6 @@ Papermill Procurement es una solución integral para la gestión de compras y ap
 - **MySQL 8.0** - Base de datos
 - **Redis 7** - Caché y colas
 
-### Frontend
-- **HTML/CSS/JavaScript** - Frontend básico
-- **Node.js 22** - Entorno de ejecución
-
 ### DevOps
 - **Docker & Docker Compose** - Contenedorización
 - **Nginx** - Servidor web
@@ -53,7 +49,6 @@ docker-compose up -d
 
 Esto iniciará los siguientes servicios:
 - **Nginx** en `http://localhost:8088`
-- **Frontend** en `http://localhost:5174`
 - **MySQL** en puerto `3307`
 - **Redis** en puerto `6381`
 - **PHP-FPM** para el backend Laravel
@@ -71,68 +66,6 @@ php artisan key:generate
 php artisan migrate
 php artisan db:seed
 ```
-
-### 4. Configurar el frontend
-
-```bash
-# Acceder al contenedor Node
-docker exec -it papermill-node sh
-
-# Dentro del contenedor
-npm install
-```
-## Limpieza de Caché en Docker
-
-Cuando trabajas con Vite en un contenedor Docker, es necesario limpiar el caché de Vite después de hacer cambios significativos en el código, especialmente cuando:
-
-- Modificas archivos de configuración (rutas, imports, exports)
-- Cambias dependencias o módulos
-- Actualizas componentes del sistema de navegación
-- El navegador muestra páginas en blanco o errores 404 sin razón aparente
-
-### ¿Por qué es necesario?
-
-El caché de Vite se almacena dentro del contenedor Docker en `node_modules/.vite`. Cuando haces cambios en el código de tu máquina local, Docker sincroniza los archivos, pero el caché de Vite puede quedar desactualizado, causando:
-
-- Errores de módulos no encontrados
-- Exportaciones que no se reconocen
-- Páginas en blanco
-- Componentes que no se actualizan
-
-### Comandos para limpiar caché
-
-**Opción 1: Reiniciar el contenedor (más rápido)**
-```bash
-docker-compose restart
-```
-
-**Opción 2: Limpiar caché manualmente**
-```bash
-docker exec <nombre_del_contenedor> rm -rf node_modules/.vite
-docker-compose restart
-```
-
-**Opción 3: Reconstruir completamente (cuando las anteriores no funcionan)**
-```bash
-docker-compose down
-docker-compose up -d --build
-```
-
-### Ver logs del contenedor
-
-Para diagnosticar problemas:
-```bash
-docker-compose logs -f
-```
-
-### Encontrar el nombre del contenedor
-
-```bash
-docker ps
-```
-
-**Nota:** Después de limpiar el caché, siempre actualiza el navegador con `Ctrl+Shift+R` (hard refresh) para limpiar también el caché del navegador.
-
 
 ## 🎮 Scripts de PowerShell
 
@@ -180,7 +113,6 @@ REDIS_PORT=6379
 | Servicio | Puerto Host | Puerto Contenedor |
 |----------|-------------|-------------------|
 | Nginx    | 8088        | 80                |
-| Frontend | 5174        | 5173              |
 | MySQL    | 3307        | 3306              |
 | Redis    | 6381        | 6379              |
 
@@ -196,7 +128,6 @@ papermill-procurement/
 │   ├── resources/       # Vistas y assets
 │   ├── routes/          # Definición de rutas
 │   └── tests/           # Tests automatizados
-├── frontend/            # Aplicación frontend
 ├── docker/              # Configuraciones Docker
 │   ├── nginx/          # Configuración Nginx
 │   ├── php/            # Dockerfile y configuración PHP
