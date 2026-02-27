@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id()->comment('ID autoincremental');
             $table->string('name', 100)->comment('Nombre de la categoría');
             $table->foreignId('parent_id')->nullable()->constrained('material_categories')->onDelete('set null')->comment('FK: Categoría padre para estructura jerárquica (ref: material_categories.id)');
-            $table->json('attributes')->nullable()->comment('Atributos personalizados en formato JSON');
+            $table->json('attributes')->nullable()->comment('Atributos específicos por categoría en JSON');
             $table->timestamps();
             $table->softDeletes();
 

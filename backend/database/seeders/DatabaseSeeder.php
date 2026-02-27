@@ -22,6 +22,10 @@ class DatabaseSeeder extends Seeder
             PaymentTermSeeder::class,
             CurrencySeeder::class,
 
+            // 1b. Catálogos de materiales (tipos y unidades)
+            MaterialTypeSeeder::class,
+            UnitOfMeasureSeeder::class,
+
             // 2. Proveedores (aún sin el contacto primario)
             SupplierSeeder::class,
 
@@ -30,6 +34,12 @@ class DatabaseSeeder extends Seeder
 
             // 4. Permisos y otros seeders
             PermissionsSeeder::class,
+
+            // 5. Categorías de materiales con sus atributos específicos
+            MaterialCategorySeeder::class,
+
+            // 6. Materiales (que se asocian a categorías)
+            MaterialSeeder::class,
         ]);
     }
 }

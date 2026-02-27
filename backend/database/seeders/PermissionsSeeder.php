@@ -65,6 +65,18 @@ class PermissionsSeeder extends Seeder
             'permissions.view',
             // Users
             'users.manage',
+            // Materials
+            'materials.view_any',
+            'materials.view',
+            'materials.create',
+            'materials.update',
+            'materials.delete',
+            // Material categories
+            'material_categories.view_any',
+            'material_categories.view',
+            'material_categories.create',
+            'material_categories.update',
+            'material_categories.delete',
         ];
 
         foreach ($permissions as $permission) {

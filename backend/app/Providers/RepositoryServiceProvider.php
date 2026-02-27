@@ -15,6 +15,8 @@ use App\Repositories\PaymentTermRepositoryInterface;
 use App\Repositories\PaymentTermRepository;
 use App\Repositories\SupplierContactRepositoryInterface;
 use App\Repositories\SupplierContactRepository;
+use App\Repositories\MaterialRepositoryInterface;
+use App\Repositories\MaterialRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -51,6 +53,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             SupplierContactRepositoryInterface::class,
             SupplierContactRepository::class
+        );
+
+        $this->app->bind(
+            MaterialRepositoryInterface::class,
+            MaterialRepository::class
         );
     }
 

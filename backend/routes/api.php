@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
@@ -36,6 +37,16 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [SupplierController::class, 'destroy'])->middleware('permission:suppliers.delete');
             Route::post('/{id}/restore', [SupplierController::class, 'restore'])->middleware('permission:suppliers.restore');
             Route::patch('/{id}/scores', [SupplierController::class, 'updateScores'])->middleware('permission:suppliers.update_scores');
+        });
+
+        // Rutas de materiales (protegidas)
+        Route::prefix('materials')->group(function () {
+            Route::get('/search', [MaterialController::class, 'search'])->middleware('permission:materials.view_any');
+            Route::get('/', [MaterialController::class, 'index'])->middleware('permission:materials.view_any');
+            Route::get('/{id}', [MaterialController::class, 'show'])->middleware('permission:materials.view');
+            Route::post('/', [MaterialController::class, 'store'])->middleware('permission:materials.create');
+            Route::put('/{id}', [MaterialController::class, 'update'])->middleware('permission:materials.update');
+            Route::delete('/{id}', [MaterialController::class, 'destroy'])->middleware('permission:materials.delete');
         });
 
         // Tipos de proveedores
