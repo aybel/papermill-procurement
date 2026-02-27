@@ -17,6 +17,12 @@ use App\Repositories\SupplierContactRepositoryInterface;
 use App\Repositories\SupplierContactRepository;
 use App\Repositories\MaterialRepositoryInterface;
 use App\Repositories\MaterialRepository;
+use App\Repositories\MaterialTypeRepositoryInterface;
+use App\Repositories\MaterialTypeRepository;
+use App\Repositories\MaterialCategoryRepositoryInterface;
+use App\Repositories\MaterialCategoryRepository;
+use App\Repositories\UnitOfMeasureRepositoryInterface;
+use App\Repositories\UnitOfMeasureRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -58,6 +64,21 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             MaterialRepositoryInterface::class,
             MaterialRepository::class
+        );
+
+        $this->app->bind(
+            MaterialTypeRepositoryInterface::class,
+            MaterialTypeRepository::class
+        );
+
+        $this->app->bind(
+            MaterialCategoryRepositoryInterface::class,
+            MaterialCategoryRepository::class
+        );
+
+        $this->app->bind(
+            UnitOfMeasureRepositoryInterface::class,
+            UnitOfMeasureRepository::class
         );
     }
 

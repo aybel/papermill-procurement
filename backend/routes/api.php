@@ -12,6 +12,9 @@ use App\Http\Controllers\SupplierStatusController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\PaymentTermController;
 use App\Http\Controllers\SupplierContactController;
+use App\Http\Controllers\MaterialTypeController;
+use App\Http\Controllers\MaterialCategoryController;
+use App\Http\Controllers\UnitOfMeasureController;
 
 Route::prefix('v1')->group(function () {
     Route::post('auth/register', [AuthController::class, 'register']);
@@ -93,6 +96,36 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [SupplierContactController::class, 'store'])->middleware('permission:supplier_contacts.create');
             Route::put('/{id}', [SupplierContactController::class, 'update'])->middleware('permission:supplier_contacts.update');
             Route::delete('/{id}', [SupplierContactController::class, 'destroy'])->middleware('permission:supplier_contacts.delete');
+        });
+
+        // Tipos de materiales
+        Route::prefix('material-types')->group(function () {
+            Route::get('/search', [MaterialTypeController::class, 'search'])->middleware('permission:material_types.view_any');
+            Route::get('/', [MaterialTypeController::class, 'index'])->middleware('permission:material_types.view_any');
+            Route::get('/{id}', [MaterialTypeController::class, 'show'])->middleware('permission:material_types.view');
+            Route::post('/', [MaterialTypeController::class, 'store'])->middleware('permission:material_types.create');
+            Route::put('/{id}', [MaterialTypeController::class, 'update'])->middleware('permission:material_types.update');
+            Route::delete('/{id}', [MaterialTypeController::class, 'destroy'])->middleware('permission:material_types.delete');
+        });
+
+        // Categorías de materiales
+        Route::prefix('material-categories')->group(function () {
+            Route::get('/search', [MaterialCategoryController::class, 'search'])->middleware('permission:material_categories.view_any');
+            Route::get('/', [MaterialCategoryController::class, 'index'])->middleware('permission:material_categories.view_any');
+            Route::get('/{id}', [MaterialCategoryController::class, 'show'])->middleware('permission:material_categories.view');
+            Route::post('/', [MaterialCategoryController::class, 'store'])->middleware('permission:material_categories.create');
+            Route::put('/{id}', [MaterialCategoryController::class, 'update'])->middleware('permission:material_categories.update');
+            Route::delete('/{id}', [MaterialCategoryController::class, 'destroy'])->middleware('permission:material_categories.delete');
+        });
+
+        // Unidades de medida
+        Route::prefix('units-of-measure')->group(function () {
+            Route::get('/search', [UnitOfMeasureController::class, 'search'])->middleware('permission:units_of_measure.view_any');
+            Route::get('/', [UnitOfMeasureController::class, 'index'])->middleware('permission:units_of_measure.view_any');
+            Route::get('/{id}', [UnitOfMeasureController::class, 'show'])->middleware('permission:units_of_measure.view');
+            Route::post('/', [UnitOfMeasureController::class, 'store'])->middleware('permission:units_of_measure.create');
+            Route::put('/{id}', [UnitOfMeasureController::class, 'update'])->middleware('permission:units_of_measure.update');
+            Route::delete('/{id}', [UnitOfMeasureController::class, 'destroy'])->middleware('permission:units_of_measure.delete');
         });
 
         // Rutas para Roles y Permisos (protegidas)

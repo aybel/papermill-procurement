@@ -77,6 +77,18 @@ class PermissionsSeeder extends Seeder
             'material_categories.create',
             'material_categories.update',
             'material_categories.delete',
+            // Material types
+            'material_types.view_any',
+            'material_types.view',
+            'material_types.create',
+            'material_types.update',
+            'material_types.delete',
+            // Units of measure
+            'units_of_measure.view_any',
+            'units_of_measure.view',
+            'units_of_measure.create',
+            'units_of_measure.update',
+            'units_of_measure.delete',
         ];
 
         foreach ($permissions as $permission) {
