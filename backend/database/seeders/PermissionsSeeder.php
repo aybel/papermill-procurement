@@ -30,6 +30,36 @@ class PermissionsSeeder extends Seeder
             'suppliers.delete',
             'suppliers.restore',
             'suppliers.update_scores',
+            // Supplier types
+            'supplier_types.view_any',
+            'supplier_types.view',
+            'supplier_types.create',
+            'supplier_types.update',
+            'supplier_types.delete',
+            // Supplier statuses
+            'supplier_statuses.view_any',
+            'supplier_statuses.view',
+            'supplier_statuses.create',
+            'supplier_statuses.update',
+            'supplier_statuses.delete',
+            // Currencies
+            'currencies.view_any',
+            'currencies.view',
+            'currencies.create',
+            'currencies.update',
+            'currencies.delete',
+            // Payment terms
+            'payment_terms.view_any',
+            'payment_terms.view',
+            'payment_terms.create',
+            'payment_terms.update',
+            'payment_terms.delete',
+            // Supplier contacts
+            'supplier_contacts.view_any',
+            'supplier_contacts.view',
+            'supplier_contacts.create',
+            'supplier_contacts.update',
+            'supplier_contacts.delete',
             // Roles & Permissions
             'roles.manage',
             'permissions.view',

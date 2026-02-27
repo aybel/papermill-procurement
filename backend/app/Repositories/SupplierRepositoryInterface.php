@@ -99,4 +99,10 @@ interface SupplierRepositoryInterface
      * @return Supplier
      */
     public function updateScores(int $id, float $qualityScore, float $deliveryScore): Supplier;
+
+    /**
+     * Obtener el siguiente código autogenerado para un proveedor.
+     * Formato: SUP-<secuencial>.
+     */
+    public function getNextCode(): string;
 }

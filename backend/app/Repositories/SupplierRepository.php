@@ -169,4 +169,21 @@ class SupplierRepository implements SupplierRepositoryInterface
         ]);
         return $supplier->fresh();
     }
+
+    /**
+     * Obtener el siguiente código autogenerado.
+     * Formato: SUP-<secuencial> basado en el máximo actual (incluye soft deletes).
+     */
+    public function getNextCode(): string
+    {
+        $maxNumericCode = $this->model
+            ->withTrashed()
+            ->where('code', 'like', 'SUP-%')
+            ->selectRaw("MAX(CAST(SUBSTRING(code, 5) AS UNSIGNED)) as max_code")
+            ->value('max_code');
+
+        $next = ((int) $maxNumericCode) + 1;
+
+        return 'SUP-' . $next;
+    }
 }

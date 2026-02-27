@@ -34,5 +34,9 @@ class Kernel extends HttpKernel
         'auth:api' => \App\Http\Middleware\Authenticate::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        // Spatie permission middlewares
+        'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+        'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+        'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
     ];
 }

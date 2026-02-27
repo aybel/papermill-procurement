@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\SupplierRepositoryInterface;
+use App\Http\Requests\StoreSupplierRequest;
+use App\Http\Requests\UpdateSupplierRequest;
+use App\Http\Requests\UpdateSupplierScoresRequest;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -111,25 +114,14 @@ class SupplierController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreSupplierRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'code' => 'required|string|max:20|unique:suppliers,code',
-                'name' => 'required|string|max:255',
-                'tax_id' => 'nullable|string|max:20',
-                'supplier_type_id' => 'nullable|exists:supplier_types,id',
-                'supplier_status_id' => 'required|exists:supplier_statuses,id',
-                'primary_contact_id' => 'nullable|exists:supplier_contacts,id',
-                'quality_score' => 'nullable|numeric|min:0|max:1',
-                'delivery_score' => 'nullable|numeric|min:0|max:1',
-                'payment_terms_id' => 'required|exists:payment_terms,id',
-                'currency_id' => 'required|exists:currencies,id',
-                'credit_limit' => 'nullable|numeric|min:0',
-                'notes' => 'nullable|string|max:500',
-            ]);
+            $data = $request->validated();
+            // Generar código automático: SUP-<total+1> basado en el máximo existente
+            $data['code'] = $this->supplierRepository->getNextCode();
 
-            $supplier = $this->supplierRepository->create($validated);
+            $supplier = $this->supplierRepository->create($data);
 
             return response()->json([
                 'success' => true,
@@ -158,25 +150,10 @@ class SupplierController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateSupplierRequest $request, int $id): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'code' => 'sometimes|required|string|max:20|unique:suppliers,code,' . $id,
-                'name' => 'sometimes|required|string|max:255',
-                'tax_id' => 'nullable|string|max:20',
-                'supplier_type_id' => 'nullable|exists:supplier_types,id',
-                'supplier_status_id' => 'sometimes|required|exists:supplier_statuses,id',
-                'primary_contact_id' => 'nullable|exists:supplier_contacts,id',
-                'quality_score' => 'nullable|numeric|min:0|max:1',
-                'delivery_score' => 'nullable|numeric|min:0|max:1',
-                'payment_terms_id' => 'sometimes|required|exists:payment_terms,id',
-                'currency_id' => 'sometimes|required|exists:currencies,id',
-                'credit_limit' => 'nullable|numeric|min:0',
-                'notes' => 'nullable|string|max:500',
-            ]);
-
-            $supplier = $this->supplierRepository->update($id, $validated);
+            $supplier = $this->supplierRepository->update($id, $request->validated());
 
             return response()->json([
                 'success' => true,
@@ -280,18 +257,13 @@ class SupplierController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function updateScores(Request $request, int $id): JsonResponse
+    public function updateScores(UpdateSupplierScoresRequest $request, int $id): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'quality_score' => 'required|numeric|min:0|max:1',
-                'delivery_score' => 'required|numeric|min:0|max:1',
-            ]);
-
             $supplier = $this->supplierRepository->updateScores(
                 $id,
-                $validated['quality_score'],
-                $validated['delivery_score']
+                $request->validated('quality_score'),
+                $request->validated('delivery_score')
             );
 
             return response()->json([
