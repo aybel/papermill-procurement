@@ -6,6 +6,7 @@ use App\Http\Requests\StoreMaterialRequest;
 use App\Http\Requests\UpdateMaterialRequest;
 use App\Repositories\MaterialRepositoryInterface;
 use App\Services\SKUGenerator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -85,15 +86,17 @@ class MaterialController extends Controller
     public function store(StoreMaterialRequest $request): JsonResponse
     {
         try {
+            $data = $request->validated();
 
-            if (!$request->has('sku')) {
+            // Generar SKU si no viene en la petición
+            if (empty($data['sku'])) {
                 $skuGenerator = new SKUGenerator();
-                $request->merge([
-                    'sku' => $skuGenerator->generate($request->all())
-                ]);
+                $data['sku'] = $skuGenerator->generate($data);
             }
 
-            $material = $this->materialRepository->create($request->validated());
+            Log::info('Creando material con datos: ', $data);
+
+            $material = $this->materialRepository->create($data);
 
             return response()->json([
                 'success' => true,

@@ -14,7 +14,7 @@ class StoreMaterialRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sku' => 'required|string|max:50|unique:materials,sku',
+            'sku' => 'nullable|string|max:50|unique:materials,sku',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:material_categories,id',
@@ -37,9 +37,6 @@ class StoreMaterialRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'sku.required' => 'El SKU es obligatorio.',
-            'sku.unique' => 'El SKU ya está en uso.',
-            'sku.max' => 'El SKU no debe exceder 50 caracteres.',
             'name.required' => 'El nombre es obligatorio.',
             'name.max' => 'El nombre no debe exceder 255 caracteres.',
             'category_id.exists' => 'La categoría seleccionada no existe.',
