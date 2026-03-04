@@ -25,6 +25,8 @@ return new class extends Migration
             $table->index('is_active', 'idx_currencies_active');
         });
 
+        DB::statement("ALTER TABLE `currencies` comment 'Catálogo de monedas'");
+
         // Insertar monedas comunes
         DB::table('currencies')->insert([
             [

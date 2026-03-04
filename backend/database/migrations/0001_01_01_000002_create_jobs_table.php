@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -21,6 +22,8 @@ return new class extends Migration
             $table->unsignedInteger('created_at');
         });
 
+        DB::statement("ALTER TABLE `jobs` comment 'Tabla para gestionar los trabajos en cola de Laravel'");
+
         Schema::create('job_batches', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('name');
@@ -34,6 +37,8 @@ return new class extends Migration
             $table->integer('finished_at')->nullable();
         });
 
+        DB::statement("ALTER TABLE `job_batches` comment 'Tabla para gestionar los lotes de trabajos en cola de Laravel'");
+
         Schema::create('failed_jobs', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
@@ -43,6 +48,8 @@ return new class extends Migration
             $table->longText('exception');
             $table->timestamp('failed_at')->useCurrent();
         });
+
+        DB::statement("ALTER TABLE `failed_jobs` comment 'Tabla para registrar los trabajos en cola que han fallado'");
     }
 
     /**

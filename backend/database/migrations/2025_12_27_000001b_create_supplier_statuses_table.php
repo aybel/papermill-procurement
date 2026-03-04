@@ -22,6 +22,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        DB::statement("ALTER TABLE `supplier_statuses` comment 'Catálogo de estados de proveedores'");
+
         // Insertar estados iniciales
         DB::table('supplier_statuses')->insert([
             ['code' => 'active', 'name' => 'Activo', 'description' => 'Proveedor activo y operativo', 'color' => 'success', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -30,6 +31,8 @@ return new class extends Migration
             $table->unique(['name', 'guard_name']);
         });
 
+        DB::statement("ALTER TABLE `{$tableNames['permissions']}` comment 'Tabla de permisos del sistema'");
+
         Schema::create($tableNames['roles'], static function (Blueprint $table) use ($teams, $columnNames) {
             // $table->engine('InnoDB');
             $table->bigIncrements('id'); // role id
@@ -46,6 +49,8 @@ return new class extends Migration
                 $table->unique(['name', 'guard_name']);
             }
         });
+
+        DB::statement("ALTER TABLE `{$tableNames['roles']}` comment 'Tabla de roles del sistema'");
 
         Schema::create($tableNames['model_has_permissions'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotPermission, $teams) {
             $table->unsignedBigInteger($pivotPermission);
@@ -71,6 +76,8 @@ return new class extends Migration
 
         });
 
+        DB::statement("ALTER TABLE `{$tableNames['model_has_permissions']}` comment 'Tabla pivote para asignar permisos directamente a modelos (ej: usuarios)'");
+
         Schema::create($tableNames['model_has_roles'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotRole, $teams) {
             $table->unsignedBigInteger($pivotRole);
 
@@ -94,6 +101,8 @@ return new class extends Migration
             }
         });
 
+        DB::statement("ALTER TABLE `{$tableNames['model_has_roles']}` comment 'Tabla pivote para asignar roles a modelos (ej: usuarios)'");
+
         Schema::create($tableNames['role_has_permissions'], static function (Blueprint $table) use ($tableNames, $pivotRole, $pivotPermission) {
             $table->unsignedBigInteger($pivotPermission);
             $table->unsignedBigInteger($pivotRole);
@@ -110,6 +119,8 @@ return new class extends Migration
 
             $table->primary([$pivotPermission, $pivotRole], 'role_has_permissions_permission_id_role_id_primary');
         });
+
+        DB::statement("ALTER TABLE `{$tableNames['role_has_permissions']}` comment 'Tabla pivote para asignar permisos a roles'");
 
         app('cache')
             ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)

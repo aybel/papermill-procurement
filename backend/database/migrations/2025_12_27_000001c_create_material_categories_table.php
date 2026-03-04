@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -21,6 +22,8 @@ return new class extends Migration
 
             $table->index('parent_id', 'idx_material_categories_parent'); // Índice para búsquedas por categoría padre
         });
+
+        DB::statement("ALTER TABLE `material_categories` comment 'Catálogo de categorías de materiales'");
     }
 
     /**

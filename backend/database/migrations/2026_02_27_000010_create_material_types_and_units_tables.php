@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     public function up(): void
@@ -19,6 +19,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        DB::statement("ALTER TABLE `material_types` comment 'Catálogo de tipos de materiales'");
+
         Schema::create('units_of_measure', function (Blueprint $table) {
             $table->id()->comment('ID autoincremental');
             $table->string('code', 50)->unique()->comment('Código único de la unidad (ej. kg, m2, pliego)');
@@ -33,6 +35,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(true)->comment('Indica si la unidad está activa');
             $table->timestamps();
         });
+
+        DB::statement("ALTER TABLE `units_of_measure` comment 'Catálogo de unidades de medida'");
 
         Schema::table('materials', function (Blueprint $table) {
             $table->foreignId('material_type_id')

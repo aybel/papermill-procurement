@@ -1,310 +1,272 @@
-# Migraciones del Sistema de Compras - Papermill
-
-## Cambios Implementados
-
-Se han creado las migraciones del sistema usando **IDs autoincrementales** de MySQL, con una estructura simplificada enfocándose en las funcionalidades core del sistema de compras para la industria papelera.
-
-## Tablas Principales
-
-### Tablas Catálogo
-
-#### 1. supplier_types
-- Catálogo de tipos de proveedores
-- Tipos predefinidos: raw_material, packaging, chemical, service, equipment
-- Permite agregar nuevos tipos desde la aplicación
-
-#### 2. supplier_statuses
-- Catálogo de estados de proveedores
-- Estados: active, suspended, inactive
-- Incluye campo color para UI
-
-### 3. material_categories
-- Categorías jerárquicas para clasificar materiales
-- Soporte para atributos personalizados en JSON
-- Soft deletes habilitado
-
-### 4. suppliers (Proveedores)
-- Información de contacto completa
-- Métricas de desempeño (calidad, entrega, score general)
-- Gestión de crédito y términos de pago
-- Relacionado con supplier_types y supplier_statuses mediante foreign keys
-- Relación con supplier_contacts para contacto principal
-
-### 4a. supplier_contacts (Contactos de Proveedores)
-- Almacena múltiples contactos por proveedor
-- Información detallada: nombre, email, teléfono, celular, cargo, departamento
-- Campo is_primary para identificar contacto principal
-- Relación uno-a-muchos con suppliers
-
-### 5. materials (Materiales)
-- Campos específicos para industria papelera: grammage, width, length, color
-- Gestión de stock con reorder_point calculado automáticamente
-- Tracking de costos (promedio y último precio de compra)
-
-### 6. purchase_requisitions (Requisiciones)
-- Workflow de aprobación con approver_id
-- Estados: draft, pending_approval, approved, rejected, converted, cancelled
-- Prioridades: low, medium, high, urgent
-
-### 7. purchase_orders (Órdenes de Compra)
-- Desglose financiero completo: subtotal, tax, shipping_cost, total_amount
-- Tracking de fechas: issue_date, expected_delivery, actual_delivery
-- Estados: draft, sent, confirmed, partial_received, completed, cancelled
-
-### 8. purchase_order_items
-- Relación muchos-a-muchos entre purchase_orders y materials
-- Campo total_price calculado automáticamente (stored generated column)
-- Tracking de cantidades recibidas y rechazadas
-
-### 9. receipts
-- Registro de recepción de materiales
-- Vinculado a purchase_orders
-
-### 10. quality_inspections
-- Pruebas específicas para papel:
-  - Grammage (gramaje)
-  - Humidity (humedad)
-  - Thickness (espesor/calibre)
-  - Tensile strength (resistencia a tracción)
-- Inspección visual y defectos
-- Estados: pending, passed, failed, conditional
-
-### 11. supplier_performance_daily (Vista)
-- Vista SQL para KPIs de proveedores
-- Métricas diarias agregadas: órdenes, cantidad, gasto, calidad, entregas a tiempo
-
-## Comandos de Migración
-
-### Ejecutar todas las migraciones
-```bash
-docker exec -it papermill-php php artisan migrate
-```
-
-### Refrescar base de datos (desarrollo)
-```bash
-docker exec -it papermill-php php artisan migrate:fresh
-```
-
-### Con seeders
-```bash
-docker exec -it papermill-php php artisan migrate:fresh --seed
-```
-
-### Rollback última migración
-```bash
-docker exec -it papermill-php php artisan migrate:rollback
-```
-
-## Orden de Ejecución
-
-Las migraciones se ejecutan en este orden:
-1. `2025_12_27_000001a_create_supplier_types_table.php` - Catálogo de tipos de proveedores
-2. `2025_12_27_000001b_create_supplier_statuses_table.php` - Catálogo de estados de proveedores
-3. `2025_12_27_000001c_create_material_categories_table.php` - Material categories
-4. `2025_12_27_000002_create_suppliers_table.php` - Suppliers
-5. `2025_12_27_000002a_create_supplier_contacts_table.php` - Supplier contacts
-6. `2025_12_27_000002b_add_primary_contact_to_suppliers.php` - Agrega FK de contacto principal a suppliers
-7. `2025_12_27_000003_create_materials_table.php` - Materials
-8. `2025_12_27_000005_create_requisitions_table.php` - Purchase requisitions
-9. `2025_12_27_000009_create_purchase_orders_table.php` - Purchase orders
-10. `2025_12_27_000016_create_purchase_order_items_table.php` - PO items
-11. `2025_12_27_000017_create_receipts_table.php` - Receipts
-12. `2025_12_27_000018_create_quality_inspections_table.php` - Quality inspections
-13. `2025_12_27_000019_create_supplier_performance_view.php` - Performance view
-
-## Notas Importantes
-
-### Generated Columns
-
-Algunos campos se calculan automáticamente:
-- `materials.reorder_point` = `min_stock + safety_stock`
-- `purchase_order_items.total_price` = `quantity * unit_price`
-
-Estos campos NO se pueden asignar manualmente en Laravel, se calculan en la base de datos.
-
-### Soft Deletes
-
-Las siguientes tablas tienen soft deletes:
-- `material_categories`
-- `suppliers`
-
-Usa `->withTrashed()` para incluir registros eliminados en consultas.
-
-### Índices
-
-Se han creado índices en:
-- Campos de búsqueda frecuente (sku, code, status)
-- Foreign keys para optimizar joins
-- Campos usados en WHERE y ORDER BY
-
-## Base de Datos Recomendada
-
-El esquema está optimizado para **MySQL 8.0+**, que soporta:
-- Generated columns (STORED)
-- JSON columns
-- Funciones avanzadas para vistas
-
-## Ejemplo de Modelo Laravel
-
-```php
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-class Supplier extends Model
-{
-    use SoftDeletes;
-
-    protected $fillable = [
-        'code',
-        'name',
-        'tax_id',
-        'supplier_type_id',
-        'supplier_status_id',
-        'contact_name',
-        'contact_email',
-        'contact_phone',
-        'quality_score',
-        'delivery_score',
-        'overall_score',
-        'payment_terms',
-        'credit_limit',
-    ];
-
-    protected $casts = [
-        'quality_score' => 'decimal:2',
-        'delivery_score' => 'decimal:2',
-        'overall_score' => 'decimal:2',
-        'credit_limit' => 'decimal:2',
-        'deleted_at' => 'datetime',
-    ];
-
-    public function supplierType()
-    {
-        return $this->belongsTo(SupplierType::class);
-    }
-
-    public function supplierStatus()
-    {
-        return $this->belongsTo(SupplierStatus::class);
-    }
-
-    public function purchaseOrders()
-    {
-        return $this->hasMany(PurchaseOrder::class);
-    }
-
-    public function contacts()
-    {
-        return $this->hasMany(SupplierContact::class);
-    }
-
-    public function primaryContact()
-    {
-        return $this->belongsTo(SupplierContact::class, 'primary_contact_id');
-    }
-}
-```
-
-### Modelo SupplierContact
-
-```php
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class SupplierContact extends Model
-{
-    protected $fillable = [
-        'supplier_id',
-        'name',
-        'email',
-        'phone',
-        'mobile',
-        'position',
-        'department',
-        'is_primary',
-        'is_active',
-        'notes',
-    ];
-
-    protected $casts = [
-        'is_primary' => 'boolean',
-        'is_active' => 'boolean',
-    ];
-
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class);
-    }
-}
-```
-
-### Modelos de Catálogo
-
-```php
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class SupplierType extends Model
-{
-    protected $fillable = ['code', 'name', 'description', 'is_active'];
-
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
-    public function suppliers()
-    {
-        return $this->hasMany(Supplier::class);
-    }
-}
-
-class SupplierStatus extends Model
-{
-    protected $fillable = ['code', 'name', 'description', 'color', 'is_active'];
-
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
-    public function suppliers()
-    {
-        return $this->hasMany(Supplier::class);
-    }
-}
-```
-
-## Testing
-
-Para verificar que las migraciones funcionan correctamente:
-
-```bash
-docker exec -it papermill-php bash
-php artisan migrate:fresh
-php artisan tinker
-
-# En tinker, prueba crear un registro
-App\Models\Supplier::create([
-    'code' => 'SUP001',
-    'name' => 'Test Supplier',
-    'supplier_type' => 'raw_material',
-    'status' => 'active'
-]);
-```
-
-## Próximos Pasos
-
-1. Crear los modelos Eloquent correspondientes
-2. Crear seeders con datos de prueba
-3. Implementar factories para testing
-4. Configurar relaciones entre modelos
-5. Crear observers para calcular métricas automáticamente
+# Documentación de Migraciones - Papermill Procurement
+
+Este documento proporciona una descripción detallada de la estructura de la base de datos, organizada por módulos funcionales.
+
+## Módulo Core y de Autenticación
+
+Tablas base de Laravel y para la gestión de usuarios y permisos.
+
+-   **`users`**: Almacena las cuentas de usuario.
+-   **`password_reset_tokens`**: Tokens para el reseteo de contraseñas.
+-   **`sessions`**: Gestiona las sesiones de los usuarios.
+-   **`cache` / `cache_locks`**: Tablas para el sistema de caché de Laravel.
+-   **`jobs` / `job_batches` / `failed_jobs`**: Tablas para la gestión de colas de trabajos.
+-   **`permissions` / `roles` / `model_has_permissions` / `model_has_roles` / `role_has_permissions`**: Tablas del paquete `spatie/laravel-permission` para el control de acceso basado en roles.
+
+---
+
+## Módulo de Catálogos Generales
+
+Tablas que almacenan información de configuración y catálogos transversales.
+
+### `departments`
+Almacena los departamentos de la empresa para vincular solicitudes y presupuestos.
+-   **`id`**: Identificador único.
+-   **`name`**: Nombre del departamento (ej. "Producción", "Mantenimiento").
+
+### `currencies`
+Catálogo de monedas para transacciones.
+-   **`code`**: Código ISO (ej. "USD").
+-   **`name`**: Nombre de la moneda (ej. "Dólar Estadounidense").
+-   **`symbol`**: Símbolo (ej. "$").
+-   **`exchange_rate`**: Tasa de cambio respecto a una moneda base.
+-   **`is_base`**: Booleano que indica si es la moneda principal del sistema.
+
+### `payment_terms`
+Catálogo de términos de pago.
+-   **`code`**: Código único (ej. "NET30").
+-   **`name`**: Nombre descriptivo (ej. "Neto 30 días").
+-   **`days`**: Número de días para el pago.
+
+---
+
+## Módulo de Proveedores (Suppliers)
+
+Gestión integral de la información de los proveedores.
+
+### `supplier_types`
+Clasifica a los proveedores.
+-   **`code`**: Código único (ej. "raw_material").
+-   **`name`**: Nombre del tipo (ej. "Materia Prima").
+
+### `supplier_statuses`
+Define el estado de un proveedor.
+-   **`code`**: Código único (ej. "active").
+-   **`name`**: Nombre del estado (ej. "Activo").
+-   **`color`**: Color para la interfaz de usuario.
+
+### `suppliers`
+Tabla central de proveedores.
+-   **`code`**: Código interno del proveedor.
+-   **`name`**: Razón social.
+-   **`tax_id`**: Identificación fiscal (RUC, RFC).
+-   **`supplier_type_id`**: FK a `supplier_types`.
+-   **`supplier_status_id`**: FK a `supplier_statuses`.
+-   **`primary_contact_id`**: FK al contacto principal en `supplier_contacts`.
+-   **`quality_score` / `delivery_score`**: Métricas de rendimiento.
+-   **`payment_terms_id`**: FK a `payment_terms`.
+-   **`currency_id`**: FK a `currencies` (moneda principal del proveedor).
+-   **`credit_limit`**: Límite de crédito.
+
+### `supplier_contacts`
+Contactos asociados a un proveedor.
+-   **`supplier_id`**: FK a `suppliers`.
+-   **`name`**, **`email`**, **`phone`**, **`position`**: Datos del contacto.
+-   **`is_primary`**: Booleano para marcar al contacto principal.
+
+---
+
+## Módulo de Materiales (Inventory)
+
+Gestión de materiales, inventario y especificaciones.
+
+### `material_categories`
+Categorías jerárquicas para materiales.
+-   **`name`**: Nombre de la categoría.
+-   **`parent_id`**: FK para anidar categorías.
+-   **`attributes`**: JSON para atributos específicos.
+
+### `material_types`
+Tipos de material.
+-   **`code`**: Código único (ej. "chemical").
+-   **`name`**: Nombre del tipo (ej. "Químico").
+
+### `units_of_measure`
+Unidades de medida.
+-   **`code`**: Código único (ej. "kg").
+-   **`name`**: Nombre de la unidad (ej. "Kilogramo").
+-   **`symbol`**: Símbolo ("kg").
+-   **`category`**: Categoría (peso, volumen, etc.).
+-   **`conversion_factor`**: Factor para conversiones.
+
+### `materials`
+Tabla central de materiales.
+-   **`sku`**: Código único de producto.
+-   **`name`**: Nombre del material.
+-   **`category_id`**: FK a `material_categories`.
+-   **`material_type_id`**: FK a `material_types`.
+-   **`unit_of_measure_id`**: FK a `units_of_measure`.
+-   **`current_stock`**, **`min_stock`**, **`max_stock`**: Control de inventario.
+-   **`avg_unit_cost`**, **`last_purchase_price`**: Costos.
+-   **`grammage`**, **`width`**, **`length`**, **`color`**: Especificaciones para papel.
+---
+
+## Módulo de Presupuestos (Budgeting)
+
+Gestiona la creación y asignación de presupuestos anuales por rubro y departamento.
+
+### `budget_rubros`
+Catálogo para las diferentes categorías o rubros en los que se divide el presupuesto.
+-   **`id`**: Identificador único.
+-   **`name`**: Nombre del rubro (ej. "Gastos de Operación", "Inversión en Maquinaria").
+-   **`description`**: Descripción detallada del rubro.
+-   **`is_active`**: Booleano para activar o desactivar el uso del rubro.
+
+### `budget_assignments`
+Asigna un monto específico de presupuesto a un departamento para un rubro y año determinados.
+-   **`id`**: Identificador único.
+-   **`department_id`**: FK al departamento al que se le asigna el presupuesto.
+-   **`budget_rubro_id`**: FK al rubro presupuestal.
+-   **`year`**: Año para el cual aplica la asignación.
+-   **`assigned_amount`**: Monto total asignado.
+-   **`justification`**: Justificación o notas sobre la asignación.
+-   **`created_by` / `approved_by`**: FK a `users` para auditoría.
+-   **`unique_dept_rubro_year`**: Restricción única para evitar duplicados por departamento, rubro y año.
+
+---
+
+## Módulo de Adquisiciones (Procurement)
+
+Flujo completo desde la solicitud interna hasta el pago de facturas.
+
+### `budget_requests`
+Solicitudes de presupuesto anual por departamento.
+-   **`year`**: Año del presupuesto.
+-   **`department_id`**: FK a `departments`.
+-   **`status`**: Estado ('borrador', 'en_revision', 'aprobado', 'rechazado').
+-   **`total_amount`**: Monto total solicitado.
+-   **`approved_amount`**: Monto final aprobado.
+-   **`submitted_by` / `approved_by`**: FK a `users`.
+
+### `purchase_requisitions`
+Solicitudes internas de compra de materiales.
+-   **`pr_number`**: Número único de requisición.
+-   **`requisition_type`**: Tipo ('normal', 'urgente').
+-   **`department_id`**: FK a `departments`.
+-   **`requested_by` / `approved_by`**: FK a `users`.
+-   **`budget_request_id`**: FK a `budget_requests` para vincular al presupuesto.
+-   **`justification`**: Motivo de la compra.
+-   **`status`**: Estado del ciclo de vida de la requisición.
+-   **`total_estimated`**: Costo estimado.
+
+### `purchase_requisition_items`
+Líneas de detalle de una requisición.
+-   **`purchase_requisition_id`**: FK a `purchase_requisitions`.
+-   **`material_id`**: FK a `materials`.
+-   **`quantity`**: Cantidad solicitada.
+-   **`specifications`**: Requerimientos técnicos para este ítem.
+
+### `rfqs` (Request for Quotation)
+Solicitudes de cotización enviadas a proveedores.
+-   **`rfq_number`**: Número único de RFQ.
+-   **`purchase_requisition_id`**: FK a la requisición que la originó.
+-   **`status`**: Estado ('borrador', 'enviada', 'evaluando', 'adjudicada').
+-   **`submission_deadline`**: Fecha límite para recibir cotizaciones.
+-   **`evaluation_method`**: Criterio de selección ('menor_precio', 'mejor_valor').
+
+### `rfq_suppliers`
+Registra qué proveedores fueron invitados a una RFQ.
+-   **`rfq_id`**: FK a `rfqs`.
+-   **`supplier_id`**: FK a `suppliers`.
+-   **`status`**: Estado de la invitación ('invitado', 'aceptado', 'cotizo').
+
+### `quotations`
+Cotizaciones recibidas de los proveedores.
+-   **`quotation_number`**: Número de cotización del proveedor.
+-   **`rfq_id`**: FK a la RFQ correspondiente.
+-   **`supplier_id`**: FK al proveedor que cotiza.
+-   **`valid_until`**: Fecha de validez de la oferta.
+-   **`delivery_time_days`**: Plazo de entrega ofrecido.
+-   **`total_amount`**: Monto total cotizado.
+-   **`status`**: Estado ('recibida', 'evaluada', 'seleccionada', 'rechazada').
+-   **`evaluation_score`**: Puntaje de evaluación.
+-   **`document_path`**: Ruta al archivo PDF de la cotización.
+
+### `quotation_items`
+Líneas de detalle de una cotización.
+-   **`quotation_id`**: FK a `quotations`.
+-   **`material_id`**: FK a `materials`.
+-   **`quantity`**, **`unit_price`**, **`discount_percent`**, **`tax_rate`**: Detalles financieros por línea.
+-   **`supplier_sku`**: SKU del proveedor para el material.
+
+### `purchase_orders`
+Órdenes de compra formales.
+-   **`po_number`**: Número único de orden de compra.
+-   **`quotation_id`**: FK a la cotización ganadora.
+-   **`supplier_id`**: FK al proveedor.
+-   **`subtotal`**, **`tax_total`**, **`total_amount`**: Montos finales.
+-   **`expected_delivery_date`**: Fecha de entrega acordada.
+-   **`status`**: Estado del ciclo de vida de la orden ('borrador', 'aprobada', 'enviada', 'completada').
+
+### `purchase_order_items`
+Líneas de detalle de una orden de compra.
+-   **`purchase_order_id`**: FK a `purchase_orders`.
+-   **`material_id`**: FK a `materials`.
+-   **`quantity`**, **`unit_price`**, **`total_price`**: Valores finales de compra.
+-   **`quantity_received`**, **`quantity_rejected`**: Cantidades recibidas y rechazadas.
+
+### `purchase_order_tracking`
+Seguimiento logístico de una orden de compra.
+-   **`purchase_order_id`**: FK a `purchase_orders`.
+-   **`status`**: Estado del envío ('en_produccion', 'embarcado', 'en_transito', 'entregado').
+-   **`tracking_number`**: Número de seguimiento del transportista.
+-   **`carrier`**: Nombre del transportista.
+
+### `receipts`
+Registro de recepción de mercancías.
+-   **`receipt_number`**: Número único de recepción.
+-   **`purchase_order_id`**: FK a la orden de compra.
+-   **`received_by`**: FK al usuario que recibe.
+-   **`receipt_date`**: Fecha de recepción.
+-   **`delivery_note_number`**: Número de guía o remisión del proveedor.
+
+### `receipt_items`
+Líneas de detalle de una recepción.
+-   **`receipt_id`**: FK a `receipts`.
+-   **`purchase_order_item_id`**: FK al ítem de la orden de compra.
+-   **`quantity_received`**: Cantidad física recibida.
+-   **`quantity_accepted` / `quantity_rejected`**: Cantidades tras la inspección de calidad.
+-   **`batch_number` / `expiry_date`**: Trazabilidad del lote.
+
+### `quality_inspections`
+Inspecciones de control de calidad.
+-   **`inspection_number`**: Número único de inspección.
+-   **`receipt_item_id`**: FK al ítem recibido que se está inspeccionando.
+-   **`inspected_by`**: FK al usuario inspector.
+-   **`grammage_test`**, **`thickness_test`**, etc.: Resultados de pruebas específicas para papel.
+-   **`result`**: Resultado final ('aprobado', 'rechazado', 'cuarentena').
+-   **`defect_description`**: Descripción de los defectos encontrados.
+
+### `supplier_invoices`
+Facturas emitidas por los proveedores.
+-   **`invoice_number`**: Número de factura del proveedor.
+-   **`purchase_order_id`**: FK a la orden de compra asociada.
+-   **`invoice_date` / `due_date`**: Fechas de la factura.
+-   **`total_amount`**: Monto a pagar.
+-   **`payment_status`**: Estado del pago ('pendiente', 'pagada', 'vencida').
+
+### `payments`
+Pagos realizados a proveedores.
+-   **`payment_number`**: Número único de pago.
+-   **`supplier_invoice_id`**: FK a la factura que se está pagando.
+-   **`payment_method`**: Método ('transferencia', 'cheque').
+-   **`amount`**: Monto pagado.
+-   **`payment_date`**: Fecha del pago.
+-   **`reference_number`**: Referencia de la transacción bancaria.
+
+---
+
+## Vistas
+
+### `supplier_performance_daily`
+Vista materializada para agregar métricas de rendimiento de proveedores, facilitando la generación de KPIs.

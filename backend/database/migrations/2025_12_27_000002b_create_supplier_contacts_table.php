@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -28,6 +29,8 @@ return new class extends Migration
             $table->index('supplier_id', 'idx_supplier_contacts_supplier');
             $table->index('is_primary', 'idx_supplier_contacts_primary');
         });
+
+        DB::statement("ALTER TABLE `supplier_contacts` comment 'Almacena los contactos de los proveedores'");
     }
 
     /**

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -38,6 +39,8 @@ return new class extends Migration
             $table->index('supplier_status_id', 'idx_suppliers_status'); // Índice para búsquedas por estado
             $table->index('supplier_type_id', 'idx_suppliers_type'); // Índice para búsquedas por tipo
         });
+
+        DB::statement("ALTER TABLE `suppliers` comment 'Catálogo de proveedores de la empresa'");
     }
 
     /**

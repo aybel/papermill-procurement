@@ -24,6 +24,8 @@ return new class extends Migration
             $table->index('is_active', 'idx_payment_terms_active');
         });
 
+        DB::statement("ALTER TABLE `payment_terms` comment 'Catálogo de términos de pago'");
+
         // Insertar términos de pago comunes
         DB::table('payment_terms')->insert([
             [

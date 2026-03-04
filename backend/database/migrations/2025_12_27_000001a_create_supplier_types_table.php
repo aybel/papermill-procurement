@@ -21,6 +21,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        DB::statement("ALTER TABLE `supplier_types` comment 'Catálogo de tipos de proveedores'");
+
         // Insertar tipos iniciales
         DB::table('supplier_types')->insert([
             ['code' => 'raw_material', 'name' => 'Materia Prima', 'description' => 'Proveedores de materia prima', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],

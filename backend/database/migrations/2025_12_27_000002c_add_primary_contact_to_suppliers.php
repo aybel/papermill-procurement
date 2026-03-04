@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -14,6 +15,8 @@ return new class extends Migration
         Schema::table('suppliers', function (Blueprint $table) {
             $table->foreignId('primary_contact_id')->nullable()->after('supplier_status_id')->constrained('supplier_contacts')->onDelete('set null')->comment('FK: Contacto principal del proveedor (ref: supplier_contacts.id)');
         });
+
+        DB::statement("ALTER TABLE `suppliers` comment 'Tabla de proveedores con referencia al contacto principal'");
     }
 
     /**

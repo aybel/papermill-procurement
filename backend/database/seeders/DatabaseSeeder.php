@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+         User::factory(10)->create();
         $this->call([
             // 1. Catálogos de los que dependen los proveedores
             SupplierTypeSeeder::class,
@@ -40,6 +41,10 @@ class DatabaseSeeder extends Seeder
 
             // 6. Materiales (que se asocian a categorías)
             MaterialSeeder::class,
+            // 7. Departamentos y aprobadores
+            DepartmentSeeder::class,
+            DepartmentApproverSeeder::class,
+
         ]);
     }
 }
