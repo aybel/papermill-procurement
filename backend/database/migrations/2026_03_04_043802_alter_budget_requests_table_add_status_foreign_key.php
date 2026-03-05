@@ -17,6 +17,8 @@ return new class extends Migration
 
             // 2. Eliminar la columna de estado anterior
             $table->dropColumn('status');
+            $table->dropColumn('total_amount');
+            $table->dropColumn('approved_amount');
         });
     }
 

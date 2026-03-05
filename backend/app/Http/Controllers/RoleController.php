@@ -94,4 +94,39 @@ class RoleController extends Controller
 
         return response()->json($user->getRoleNames());
     }
+
+    /**
+     * Assign multiple permissions to a role.
+     */
+    public function assignPermissions(Request $request, Role $role)
+    {
+        $request->validate([
+            'permissions' => 'required|array',
+            'permissions.*' => 'string|exists:permissions,name'
+        ]);
+
+        $role->syncPermissions($request->permissions);
+
+        return response()->json([
+            'message' => 'Permisos asignados exitosamente',
+            'data' => $role->load('permissions')
+        ]);
+    }
+
+    /**
+     * Revoke a specific permission from a role.
+     */
+    public function revokePermission(Request $request, Role $role)
+    {
+        $request->validate([
+            'permission' => 'required|string|exists:permissions,name'
+        ]);
+
+        $role->revokePermissionTo($request->permission);
+
+        return response()->json([
+            'message' => 'Permiso revocado exitosamente',
+            'data' => $role->load('permissions')
+        ]);
+    }
 }

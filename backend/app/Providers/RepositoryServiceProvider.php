@@ -23,6 +23,18 @@ use App\Repositories\MaterialCategoryRepositoryInterface;
 use App\Repositories\MaterialCategoryRepository;
 use App\Repositories\UnitOfMeasureRepositoryInterface;
 use App\Repositories\UnitOfMeasureRepository;
+use App\Repositories\BudgetAssignmentRepositoryInterface;
+use App\Repositories\BudgetAssignmentRepository;
+use App\Repositories\DepartmentRepositoryInterface;
+use App\Repositories\DepartmentRepository;
+use App\Repositories\BudgetRequestStatusRepositoryInterface;
+use App\Repositories\BudgetRequestStatusRepository;
+use App\Repositories\BudgetRequestRepositoryInterface;
+use App\Repositories\BudgetRequestRepository;
+use App\Repositories\BudgetRequestItemRepositoryInterface;
+use App\Repositories\BudgetRequestItemRepository;
+use App\Repositories\BudgetCategoryRepositoryInterface;
+use App\Repositories\BudgetCategoryRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -79,6 +91,36 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             UnitOfMeasureRepositoryInterface::class,
             UnitOfMeasureRepository::class
+        );
+
+        $this->app->bind(
+            BudgetAssignmentRepositoryInterface::class,
+            BudgetAssignmentRepository::class
+        );
+
+        $this->app->bind(
+            DepartmentRepositoryInterface::class,
+            DepartmentRepository::class
+        );
+
+        $this->app->bind(
+            BudgetRequestStatusRepositoryInterface::class,
+            BudgetRequestStatusRepository::class
+        );
+
+        $this->app->bind(
+            BudgetRequestRepositoryInterface::class,
+            BudgetRequestRepository::class
+        );
+
+        $this->app->bind(
+            BudgetRequestItemRepositoryInterface::class,
+            BudgetRequestItemRepository::class
+        );
+
+        $this->app->bind(
+            BudgetCategoryRepositoryInterface::class,
+            BudgetCategoryRepository::class
         );
     }
 

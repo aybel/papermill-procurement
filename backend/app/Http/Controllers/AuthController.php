@@ -16,12 +16,14 @@ class AuthController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
+            'department_id' => 'nullable|integer|exists:departments,id',
         ]);
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
+            'department_id' => $data['department_id'] ?? null,
         ]);
 
         $token = Auth::guard('api')->login($user);
@@ -73,12 +75,20 @@ class AuthController extends Controller
     {
         $user = auth()->user();
 
+        // Cargar relaciones necesarias
+        $user->load(['department', 'accessibleDepartments']);
+
         // Cargamos los roles y permisos del usuario
         $roles = $user->getRoleNames();
         $permissions = $user->getAllPermissions()->pluck('name');
 
         return response()->json([
-            'user' => $user,
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'department_id' => $user->department_id,
+            'department' => $user->department, // Relación completa del departamento home
+            'accessible_departments' => $user->accessibleDepartments, // Relación completa con pivot (role)
             'roles' => $roles,
             'permissions' => $permissions,
         ]);
@@ -97,10 +107,25 @@ class AuthController extends Controller
 
     protected function respondWithToken($token)
     {
+        $user = Auth::guard('api')->user();
+
+        // Cargar relaciones necesarias
+        $user->load(['department', 'accessibleDepartments']);
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::guard('api')->factory()->getTTL() * 60
+            'expires_in' => Auth::guard('api')->factory()->getTTL() * 60,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'department_id' => $user->department_id,
+                'department' => $user->department, // Relación completa del departamento home
+                'accessible_departments' => $user->accessibleDepartments, // Relación completa con pivot (role)
+                'roles' => $user->getRoleNames(),
+                'permissions' => $user->getAllPermissions()->pluck('name'),
+            ]
         ]);
     }
 }

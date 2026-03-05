@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,7 +18,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         User::factory(10)->create();
         $this->call([
             // 1. Catálogos de los que dependen los proveedores
             SupplierTypeSeeder::class,
@@ -41,10 +43,38 @@ class DatabaseSeeder extends Seeder
 
             // 6. Materiales (que se asocian a categorías)
             MaterialSeeder::class,
+
             // 7. Departamentos y aprobadores
             DepartmentSeeder::class,
             DepartmentApproverSeeder::class,
 
+            // 8. Categorías de presupuesto
+            BudgetCategorySeeder::class,
+
+            // 9. Usuarios con diferentes roles y accesos a departamentos (DEBE IR ANTES de BudgetAssignmentSeeder)
+            UserDepartmentSeeder::class,
+
+            // 10. Asignaciones de presupuesto (requiere usuarios creados)
+            BudgetAssignmentSeeder::class,
+
         ]);
+
+        // Crear 10 usuarios aleatorios adicionales con departamentos asignados
+        $departments = Department::pluck('id')->toArray();
+        if (!empty($departments)) {
+            for ($i = 1; $i <= 10; $i++) {
+                $firstName = fake()->firstName();
+                $lastName = fake()->lastName();
+                $email = Str::slug($firstName . '.' . $lastName) . '@company.com';
+
+                User::create([
+                    'name' => $firstName . ' ' . $lastName,
+                    'email' => $email,
+                    'password' => Hash::make('pruebas'),
+                    'department_id' => $departments[array_rand($departments)],
+                ]);
+            }
+            $this->command->info('✓ 10 usuarios adicionales creados con departamentos asignados');
+        }
     }
 }

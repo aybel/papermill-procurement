@@ -89,6 +89,43 @@ class PermissionsSeeder extends Seeder
             'units_of_measure.create',
             'units_of_measure.update',
             'units_of_measure.delete',
+            // Budget categories
+            'budget_categories.view_any',
+            'budget_categories.view',
+            'budget_categories.create',
+            'budget_categories.update',
+            'budget_categories.delete',
+            // Budget assignments
+            'budget_assignments.view_any',
+            'budget_assignments.view',
+            'budget_assignments.create',
+            'budget_assignments.update',
+            'budget_assignments.delete',
+            //departments
+            'departments.view_any',
+            'departments.view',
+            'departments.create',
+            'departments.update',
+            'departments.delete',
+            //budget-request-statuses
+            'budget_request_statuses.view_any',
+            'budget_request_statuses.view',
+            'budget_request_statuses.create',
+            'budget_request_statuses.update',
+            'budget_request_statuses.delete',
+            //budget-requests
+            'budget_requests.view_any',
+            'budget_requests.view',
+            'budget_requests.create',
+            'budget_requests.update',
+            'budget_requests.delete',
+            //budget-request-items
+            'budget_request_items.view_any',
+            'budget_request_items.view',
+            'budget_request_items.create',
+            'budget_request_items.update',
+            'budget_request_items.delete',
+
         ];
 
         foreach ($permissions as $permission) {
@@ -103,15 +140,61 @@ class PermissionsSeeder extends Seeder
         $apiPermissions = Permission::where('guard_name', $guardName)->get();
         $superAdminRole->syncPermissions($apiPermissions);
 
-        // create a demo user if it doesn't exist
-        $user = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'Super Admin',
-                'password' => bcrypt('password'), // Set a default password
-            ]
-        );
+        // Crear roles adicionales para el sistema ERP
+        $this->createERPRoles($guardName);
 
-        $user->assignRole($superAdminRole);
+        // Nota: Los usuarios se asignan en UserDepartmentSeeder para evitar duplicados
+    }
+
+    /**
+     * Crear roles específicos del ERP de procurement
+     */
+    private function createERPRoles(string $guardName): void
+    {
+        // Rol: Jefe de Compras - Gestiona todo el proceso de compras
+        $jefeComprasRole = Role::firstOrCreate(['name' => 'Jefe de Compras', 'guard_name' => $guardName]);
+        $jefeComprasRole->syncPermissions([
+            'suppliers.view_any', 'suppliers.view', 'suppliers.create', 'suppliers.update',
+            'materials.view_any', 'materials.view', 'materials.create', 'materials.update',
+            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.create',
+            'budget_requests.update', 'budget_requests.delete',
+            'budget_assignments.view_any', 'budget_assignments.view',
+            'departments.view_any', 'departments.view',
+        ]);
+
+        // Rol: Comprador - Ejecuta órdenes de compra
+        $compradorRole = Role::firstOrCreate(['name' => 'Comprador', 'guard_name' => $guardName]);
+        $compradorRole->syncPermissions([
+            'suppliers.view_any', 'suppliers.view',
+            'materials.view_any', 'materials.view',
+            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.create',
+            'budget_assignments.view_any', 'budget_assignments.view',
+        ]);
+
+        // Rol: Jefe de Departamento - Gestiona su departamento
+        $jefeDepartamentoRole = Role::firstOrCreate(['name' => 'Jefe de Departamento', 'guard_name' => $guardName]);
+        $jefeDepartamentoRole->syncPermissions([
+            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.create', 'budget_requests.update',
+            'budget_assignments.view_any', 'budget_assignments.view',
+            'materials.view_any', 'materials.view',
+            'departments.view_any', 'departments.view',
+        ]);
+
+        // Rol: Empleado - Solo lectura básica
+        $empleadoRole = Role::firstOrCreate(['name' => 'Empleado', 'guard_name' => $guardName]);
+        $empleadoRole->syncPermissions([
+            'budget_requests.view',
+            'materials.view',
+        ]);
+
+        // Rol: Aprobador - Aprueba solicitudes
+        $aprobadorRole = Role::firstOrCreate(['name' => 'Aprobador', 'guard_name' => $guardName]);
+        $aprobadorRole->syncPermissions([
+            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.update',
+            'budget_assignments.view_any', 'budget_assignments.view',
+            'departments.view_any', 'departments.view',
+        ]);
+
+        $this->command->info('✓ Roles del ERP creados: Jefe de Compras, Comprador, Jefe de Departamento, Empleado, Aprobador');
     }
 }
