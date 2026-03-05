@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
 use Illuminate\Validation\Rule;
+use App\Http\Resources\RoleResource;
+use App\Http\Resources\RoleCollection;
 
 class RoleController extends Controller
 {
@@ -14,7 +16,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        return Role::with('permissions')->get();
+        return new RoleCollection(Role::with('permissions')->get());
     }
 
     /**
@@ -34,7 +36,7 @@ class RoleController extends Controller
             $role->syncPermissions($request->permissions);
         }
 
-        return response()->json($role->load('permissions'), 201);
+        return response()->json(new RoleResource($role->load('permissions')), 201);
     }
 
     /**
@@ -42,7 +44,7 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
-        return $role->load('permissions');
+        return new RoleResource($role->load('permissions'));
     }
 
     /**
@@ -63,7 +65,7 @@ class RoleController extends Controller
         $role->update(['name' => $request->name]);
         $role->syncPermissions($request->permissions);
 
-        return $role->load('permissions');
+        return new RoleResource($role->load('permissions'));
     }
 
     /**
@@ -109,7 +111,7 @@ class RoleController extends Controller
 
         return response()->json([
             'message' => 'Permisos asignados exitosamente',
-            'data' => $role->load('permissions')
+            'data' => new RoleResource($role->load('permissions'))
         ]);
     }
 
@@ -126,7 +128,7 @@ class RoleController extends Controller
 
         return response()->json([
             'message' => 'Permiso revocado exitosamente',
-            'data' => $role->load('permissions')
+            'data' => new RoleResource($role->load('permissions'))
         ]);
     }
 }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Department;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -37,6 +38,7 @@ class DatabaseSeeder extends Seeder
 
             // 4. Permisos y otros seeders
             PermissionsSeeder::class,
+            UpdatePermissionDetailsSeeder::class,
 
             // 5. Categorías de materiales con sus atributos específicos
             MaterialCategorySeeder::class,
@@ -59,22 +61,34 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
-        // Crear 10 usuarios aleatorios adicionales con departamentos asignados
-        $departments = Department::pluck('id')->toArray();
+        // Crear 10 usuarios aleatorios adicionales con departamentos asignados (ÚNICOS)
+        $departments = Department::all()->toArray();
+        $jefeDeptRole = Role::where('name', 'Jefe de Departamento')->where('guard_name', 'api')->first();
+
         if (!empty($departments)) {
-            for ($i = 1; $i <= 10; $i++) {
+            // Mezclar departamentos y limitara 10 máximo
+            shuffle($departments);
+            $departmentsToAssign = array_slice($departments, 0, 10);
+            $usersCount = count($departmentsToAssign);
+
+            foreach ($departmentsToAssign as $dept) {
                 $firstName = fake()->firstName();
                 $lastName = fake()->lastName();
                 $email = Str::slug($firstName . '.' . $lastName) . '@company.com';
 
-                User::create([
+                $user = User::create([
                     'name' => $firstName . ' ' . $lastName,
                     'email' => $email,
                     'password' => Hash::make('pruebas'),
-                    'department_id' => $departments[array_rand($departments)],
+                    'department_id' => $dept['id'], // Cada usuario en un departamento único
                 ]);
+
+                // Asignar rol Jefe de Departamento
+                if ($jefeDeptRole) {
+                    $user->syncRoles([$jefeDeptRole]);
+                }
             }
-            $this->command->info('✓ 10 usuarios adicionales creados con departamentos asignados');
+            $this->command->info("✓ {$usersCount} usuarios adicionales creados (1 Jefe de Departamento por depto)");
         }
     }
 }

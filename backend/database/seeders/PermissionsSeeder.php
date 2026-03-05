@@ -187,6 +187,16 @@ class PermissionsSeeder extends Seeder
             'materials.view',
         ]);
 
+        // Rol: Operativo - Ejecuta operaciones básicas
+        $operativoRole = Role::firstOrCreate(['name' => 'Operativo', 'guard_name' => $guardName]);
+        $operativoRole->syncPermissions([
+            'suppliers.view_any', 'suppliers.view',
+            'materials.view_any', 'materials.view',
+            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.create',
+            'budget_assignments.view_any', 'budget_assignments.view',
+            'departments.view_any', 'departments.view',
+        ]);
+
         // Rol: Aprobador - Aprueba solicitudes
         $aprobadorRole = Role::firstOrCreate(['name' => 'Aprobador', 'guard_name' => $guardName]);
         $aprobadorRole->syncPermissions([
@@ -195,6 +205,6 @@ class PermissionsSeeder extends Seeder
             'departments.view_any', 'departments.view',
         ]);
 
-        $this->command->info('✓ Roles del ERP creados: Jefe de Compras, Comprador, Jefe de Departamento, Empleado, Aprobador');
+        $this->command->info('✓ Roles del ERP creados: Jefe de Compras, Comprador, Jefe de Departamento, Empleado, Operativo, Aprobador');
     }
 }

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -42,6 +43,37 @@ class UserController extends Controller
     }
 
     /**
+     * Crear un nuevo usuario con roles y departamentos
+     */
+    public function store(StoreUserRequest $request)
+    {
+        // Crear el usuario
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'department_id' => $request->department_id,
+        ]);
+
+        // Asignar roles
+        $user->syncRoles($request->roles);
+
+        // Asignar departamentos accesibles si se proporcionan
+        if ($request->has('accessible_departments')) {
+            $syncData = [];
+            foreach ($request->accessible_departments as $dept) {
+                $syncData[$dept['department_id']] = ['role' => $dept['role']];
+            }
+            $user->accessibleDepartments()->sync($syncData);
+        }
+
+        return response()->json([
+            'message' => 'Usuario creado exitosamente',
+            'data' => $user->load(['department', 'accessibleDepartments', 'roles', 'permissions'])
+        ], 201);
+    }
+
+    /**
      * Mostrar un usuario específico con todas sus relaciones
      */
     public function show($id)
@@ -57,16 +89,9 @@ class UserController extends Controller
     /**
      * Actualizar un usuario
      */
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
         $user = User::findOrFail($id);
-
-        $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => ['sometimes', 'required', 'email', Rule::unique('users')->ignore($user->id)],
-            'password' => 'sometimes|nullable|string|min:6',
-            'department_id' => 'sometimes|nullable|exists:departments,id',
-        ]);
 
         $data = $request->only(['name', 'email', 'department_id']);
 

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
+use App\Http\Resources\PermissionCollection;
 
 class PermissionController extends Controller
 {
@@ -12,6 +12,6 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        return Permission::all();
+        return new PermissionCollection(Permission::all());
     }
 }

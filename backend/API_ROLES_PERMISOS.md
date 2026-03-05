@@ -169,13 +169,68 @@ GET /users
 }
 ```
 
-### 10. Ver un usuario específico
+### 10. Crear un nuevo usuario
+```http
+POST /users
+```
+**Requiere:** `users.manage` permission
+
+**Body:**
+```json
+{
+  "name": "Juan Pérez",
+  "email": "juan.perez@company.com",
+  "password": "password123",
+  "department_id": 3,
+  "roles": [
+    "Jefe de Compras",
+    "Aprobador"
+  ],
+  "accessible_departments": [
+    {
+      "department_id": 1,
+      "role": "viewer"
+    },
+    {
+      "department_id": 2,
+      "role": "manager"
+    }
+  ]
+}
+```
+
+**Campos:**
+- `name` (requerido): Nombre del usuario
+- `email` (requerido): Email único
+- `password` (requerido): Mínimo 6 caracteres
+- `department_id` (requerido): ID del departamento principal
+- `roles` (requerido): Array con al menos un rol
+- `accessible_departments` (opcional): Array de departamentos con sus roles (viewer, manager, approver)
+
+**Respuesta:**
+```json
+{
+  "message": "Usuario creado exitosamente",
+  "data": {
+    "id": 10,
+    "name": "Juan Pérez",
+    "email": "juan.perez@company.com",
+    "department_id": 3,
+    "department": {...},
+    "accessible_departments": [...],
+    "roles": ["Jefe de Compras", "Aprobador"],
+    "permissions": [...]
+  }
+}
+```
+
+### 11. Ver un usuario específico
 ```http
 GET /users/{id}
 ```
 **Requiere:** `users.manage` permission
 
-### 11. Actualizar un usuario
+### 12. Actualizar un usuario
 ```http
 PUT /users/{id}
 ```
@@ -191,7 +246,7 @@ PUT /users/{id}
 }
 ```
 
-### 12. Asignar roles a un usuario
+### 13. Asignar roles a un usuario
 ```http
 POST /users/{id}/roles
 ```
@@ -219,7 +274,7 @@ POST /users/{id}/roles
 }
 ```
 
-### 13. Ver roles de un usuario
+### 14. Ver roles de un usuario
 ```http
 GET /users/{id}/roles
 ```
@@ -237,7 +292,7 @@ GET /users/{id}/roles
 }
 ```
 
-### 14. Asignar departamentos accesibles a un usuario
+### 15. Asignar departamentos accesibles a un usuario
 ```http
 POST /users/{id}/departments
 ```
@@ -261,7 +316,7 @@ POST /users/{id}/departments
 
 **Nota:** `role` puede ser: `viewer`, `manager`, `approver`
 
-### 15. Ver departamentos accesibles de un usuario
+### 16. Ver departamentos accesibles de un usuario
 ```http
 GET /users/{id}/departments
 ```
