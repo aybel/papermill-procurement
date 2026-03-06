@@ -21,8 +21,7 @@ class StoreUserRequest extends FormRequest
             'roles' => 'required|array|min:1',
             'roles.*' => 'string|exists:roles,name',
             'accessible_departments' => 'nullable|array',
-            'accessible_departments.*.department_id' => 'required|integer|exists:departments,id',
-            'accessible_departments.*.role' => 'required|in:viewer,manager,approver',
+            'accessible_departments.*' => 'integer|exists:departments,id',
         ];
     }
 

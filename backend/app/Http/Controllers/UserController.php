@@ -72,8 +72,10 @@ class UserController extends Controller
         // Asignar departamentos accesibles si se proporcionan
         if ($request->has('accessible_departments')) {
             $syncData = [];
-            foreach ($request->accessible_departments as $dept) {
-                $syncData[$dept['department_id']] = ['role' => $dept['role']];
+            foreach ($request->accessible_departments as $departmentId) {
+                // Asumiendo un rol por defecto si no se especifica, por ejemplo 'viewer'
+                // O ajusta según la lógica de tu aplicación
+                $syncData[$departmentId] = ['role' => 'viewer'];
             }
             $user->accessibleDepartments()->sync($syncData);
         }
