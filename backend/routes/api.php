@@ -26,6 +26,7 @@ use App\Http\Controllers\BudgetRequestItemController;
 Route::prefix('v1')->group(function () {
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login'])->name('login');
+    Route::post('auth/set-password', [AuthController::class, 'setPassword']);
 
     Route::middleware('auth:api')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
@@ -173,7 +174,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [BudgetRequestController::class, 'store'])->middleware('permission:budget_requests.create');
             Route::put('/{id}', [BudgetRequestController::class, 'update'])->middleware('permission:budget_requests.update');
             Route::delete('/{id}', [BudgetRequestController::class, 'destroy'])->middleware('permission:budget_requests.delete');
-
         });
 
         // Ítems de solicitudes de presupuesto

@@ -7,9 +7,20 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Services\Contracts\EmailServiceInterface;
+use App\Mail\WelcomeUserMail;
+
+use Illuminate\Support\Facades\Password;
 
 class UserController extends Controller
 {
+    protected $emailService;
+
+    public function __construct(EmailServiceInterface $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+
     /**
      * Listar todos los usuarios con sus relaciones
      */
@@ -20,9 +31,9 @@ class UserController extends Controller
         // Filtrar por nombre o email
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -47,11 +58,11 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        // Crear el usuario
+        // Crear el usuario con una contraseña temporal/nula
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'department_id' => $request->department_id,
         ]);
 
@@ -67,8 +78,14 @@ class UserController extends Controller
             $user->accessibleDepartments()->sync($syncData);
         }
 
+        // Generar token para establecer contraseña
+        $token = Password::broker()->createToken($user);
+
+        // Enviar el correo de bienvenida con el token
+        $this->emailService->send($user->email, new WelcomeUserMail($user, $token));
+
         return response()->json([
-            'message' => 'Usuario creado exitosamente',
+            'message' => 'Usuario creado exitosamente. Se ha enviado un correo para establecer la contraseña.',
             'data' => $user->load(['department', 'accessibleDepartments', 'roles', 'permissions'])
         ], 201);
     }
