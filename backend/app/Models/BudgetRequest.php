@@ -14,8 +14,10 @@ class BudgetRequest extends Model
 
     protected $fillable = [
         'request_number',
+        'created',
         'year',
         'department_id',
+        'budget_category_id',
         'budget_request_status_id',
         'submitted_by',
         'approved_by',
@@ -66,6 +68,11 @@ class BudgetRequest extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function budgetCategory(): BelongsTo
+    {
+        return $this->belongsTo(BudgetCategory::class);
     }
 
     public function submittedBy(): BelongsTo

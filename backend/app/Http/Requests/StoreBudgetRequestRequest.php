@@ -16,6 +16,8 @@ class StoreBudgetRequestRequest extends FormRequest
         return [
             'year' => 'required|integer|digits:4',
             'department_id' => 'required|integer|exists:departments,id',
+            'budget_category_id' => 'required|integer|exists:budget_categories,id',
+            'created' => 'required|date',
             'budget_request_status_id' => 'required|integer|exists:budget_request_statuses,id',
             'submitted_by' => 'nullable|integer|exists:users,id',
             'approved_by' => 'nullable|integer|exists:users,id',
@@ -36,8 +38,12 @@ class StoreBudgetRequestRequest extends FormRequest
             'budget_request_status_id.exists' => 'El estado seleccionado no existe.',
             'submitted_by.exists' => 'El usuario que envía no existe.',
             'approved_by.exists' => 'El usuario aprobador no existe.',
+            'budget_category_id.exists' => 'La categoría de presupuesto seleccionada no existe.',
+            'budget_category_id.required' => 'La categoría de presupuesto es obligatoria.',
             'submitted_at.date' => 'La fecha de envío debe ser válida.',
             'approved_at.date' => 'La fecha de aprobación debe ser válida.',
+            'created.date' => 'La fecha de creación debe ser válida.',
+            'created.required' => 'La fecha de creación es obligatoria.',
         ];
     }
 }
