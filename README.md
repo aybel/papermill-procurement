@@ -44,8 +44,22 @@ cd papermill-procurement
 ### 2. Levantar los servicios con Docker
 
 ```bash
-docker-compose up -d
+docker compose up -d --build
 ```
+
+Si estás en Linux y aparece este error:
+
+`permission denied while trying to connect to the docker API at unix:///var/run/docker.sock`
+
+ejecuta:
+
+```bash
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+y vuelve a correr `docker compose up -d --build`.
 
 Esto iniciará los siguientes servicios:
 - **Nginx** en `http://localhost:8088`
@@ -62,9 +76,22 @@ docker exec -it papermill-php bash
 # Dentro del contenedor
 composer install
 cp .env.example .env
-php artisan key:generate
+php artisan key:generate --force
+php artisan jwt:secret --force
 php artisan migrate
 php artisan db:seed
+```
+
+Si `php artisan key:generate --force` falla con `No APP_KEY variable was found in the .env file`, agrega antes esta linea en `backend/.env`:
+
+```env
+APP_KEY=
+```
+
+Si aparece `SecretMissingException` de JWT, verifica que exista esta variable en `backend/.env` y luego vuelve a ejecutar `php artisan jwt:secret --force`:
+
+```env
+JWT_SECRET=
 ```
 
 ## 🎮 Scripts de PowerShell
@@ -94,6 +121,7 @@ Crear un archivo `.env` en el directorio `backend/` con las siguientes configura
 ```env
 APP_NAME="Papermill Procurement"
 APP_ENV=local
+APP_KEY=
 APP_DEBUG=true
 APP_URL=http://localhost:8088
 
@@ -106,6 +134,8 @@ DB_PASSWORD=papermill_pass
 
 REDIS_HOST=redis
 REDIS_PORT=6379
+
+JWT_SECRET=
 ```
 
 ### Puertos
