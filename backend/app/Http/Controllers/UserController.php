@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Services\Contracts\EmailServiceInterface;
 use App\Mail\WelcomeUserMail;
-
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 
 class UserController extends Controller
@@ -58,38 +58,45 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        // Crear el usuario con una contraseña temporal/nula
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-            'department_id' => $request->department_id,
-        ]);
+        try {
+            // Crear el usuario con una contraseña temporal/nula
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $request->password,
+                'department_id' => $request->department_id,
+            ]);
 
-        // Asignar roles
-        $user->syncRoles($request->roles);
+            // Asignar roles
+            $user->syncRoles($request->roles);
 
-        // Asignar departamentos accesibles si se proporcionan
-        if ($request->has('accessible_departments')) {
-            $syncData = [];
-            foreach ($request->accessible_departments as $departmentId) {
-                // Asumiendo un rol por defecto si no se especifica, por ejemplo 'viewer'
-                // O ajusta según la lógica de tu aplicación
-                $syncData[$departmentId] = ['role' => 'viewer'];
+            // Asignar departamentos accesibles si se proporcionan
+            if ($request->has('accessible_departments')) {
+                $syncData = [];
+                foreach ($request->accessible_departments as $departmentId) {
+                    // Asumiendo un rol por defecto si no se especifica, por ejemplo 'viewer'
+                    // O ajusta según la lógica de tu aplicación
+                    $syncData[$departmentId] = ['role' => 'viewer'];
+                }
+                $user->accessibleDepartments()->sync($syncData);
             }
-            $user->accessibleDepartments()->sync($syncData);
+
+            // Generar token para establecer contraseña
+            $token = Password::broker()->createToken($user);
+
+            // Enviar el correo de bienvenida con el token
+            $this->emailService->send($user->email, new WelcomeUserMail($user, $token));
+
+            return response()->json([
+                'message' => 'Usuario creado exitosamente. Se ha enviado un correo para establecer la contraseña.',
+                'data' => $user->load(['department', 'accessibleDepartments', 'roles', 'permissions'])
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error al crear el usuario: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al crear el usuario: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Generar token para establecer contraseña
-        $token = Password::broker()->createToken($user);
-
-        // Enviar el correo de bienvenida con el token
-        $this->emailService->send($user->email, new WelcomeUserMail($user, $token));
-
-        return response()->json([
-            'message' => 'Usuario creado exitosamente. Se ha enviado un correo para establecer la contraseña.',
-            'data' => $user->load(['department', 'accessibleDepartments', 'roles', 'permissions'])
-        ], 201);
     }
 
     /**

@@ -52,8 +52,8 @@ Route::prefix('v1')->group(function () {
 
         // Rutas de materiales (protegidas)
         Route::prefix('materials')->group(function () {
-            Route::get('/search', [MaterialController::class, 'search'])->middleware('permission:materials.view_any');
-            Route::get('/', [MaterialController::class, 'index'])->middleware('permission:materials.view_any');
+            Route::get('/search', [MaterialController::class, 'search']);
+            Route::get('/', [MaterialController::class, 'index']);
             Route::get('/{id}', [MaterialController::class, 'show'])->middleware('permission:materials.view');
             Route::post('/', [MaterialController::class, 'store'])->middleware('permission:materials.create');
             Route::put('/{id}', [MaterialController::class, 'update'])->middleware('permission:materials.update');
@@ -128,8 +128,8 @@ Route::prefix('v1')->group(function () {
 
         // Categorías de materiales
         Route::prefix('material-categories')->group(function () {
-            Route::get('/search', [MaterialCategoryController::class, 'search'])->middleware('permission:material_categories.view_any');
-            Route::get('/', [MaterialCategoryController::class, 'index'])->middleware('permission:material_categories.view_any');
+            Route::get('/search', [MaterialCategoryController::class, 'search']);
+            Route::get('/', [MaterialCategoryController::class, 'index']);
             Route::get('/{id}', [MaterialCategoryController::class, 'show'])->middleware('permission:material_categories.view');
             Route::post('/', [MaterialCategoryController::class, 'store'])->middleware('permission:material_categories.create');
             Route::put('/{id}', [MaterialCategoryController::class, 'update'])->middleware('permission:material_categories.update');
@@ -138,8 +138,8 @@ Route::prefix('v1')->group(function () {
 
         // Categorías presupuestarias
         Route::prefix('budget-categories')->group(function () {
-            Route::get('/search', [BudgetCategoryController::class, 'search'])->middleware('permission:budget_categories.view_any');
-            Route::get('/', [BudgetCategoryController::class, 'index'])->middleware('permission:budget_categories.view_any');
+            Route::get('/search', [BudgetCategoryController::class, 'search']);
+            Route::get('/', [BudgetCategoryController::class, 'index']);
             Route::get('/{id}', [BudgetCategoryController::class, 'show'])->middleware('permission:budget_categories.view');
             Route::post('/', [BudgetCategoryController::class, 'store'])->middleware('permission:budget_categories.create');
             Route::put('/{id}', [BudgetCategoryController::class, 'update'])->middleware('permission:budget_categories.update');
@@ -148,7 +148,7 @@ Route::prefix('v1')->group(function () {
 
         // Asignaciones de presupuesto
         Route::prefix('budget-assignments')->group(function () {
-            Route::get('/search', [BudgetAssignmentController::class, 'search'])->middleware('permission:budget_assignments.view_any');
+            Route::get('/search', [BudgetAssignmentController::class, 'search']);
             Route::get('/', [BudgetAssignmentController::class, 'index'])->middleware('permission:budget_assignments.view_any');
             Route::get('/{id}', [BudgetAssignmentController::class, 'show'])->middleware('permission:budget_assignments.view');
             Route::post('/', [BudgetAssignmentController::class, 'store'])->middleware('permission:budget_assignments.create');
@@ -158,7 +158,7 @@ Route::prefix('v1')->group(function () {
 
         // Estados de solicitudes de presupuesto
         Route::prefix('budget-request-statuses')->group(function () {
-            Route::get('/search', [BudgetRequestStatusController::class, 'search'])->middleware('permission:budget_request_statuses.view_any');
+            Route::get('/search', [BudgetRequestStatusController::class, 'search']);
             Route::get('/', [BudgetRequestStatusController::class, 'index'])->middleware('permission:budget_request_statuses.view_any');
             Route::get('/{id}', [BudgetRequestStatusController::class, 'show'])->middleware('permission:budget_request_statuses.view');
             Route::post('/', [BudgetRequestStatusController::class, 'store'])->middleware('permission:budget_request_statuses.create');

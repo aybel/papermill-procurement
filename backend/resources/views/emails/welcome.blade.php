@@ -59,9 +59,9 @@
             <p>Te damos la bienvenida a la plataforma de gestión de compras de Papermill. Estamos muy contentos de tenerte con nosotros.</p>
             <p>Tu cuenta ha sido creada exitosamente. Para empezar, por favor, establece tu contraseña haciendo clic en el siguiente botón:</p>
             <p>Este enlace es válido por {{ config('auth.passwords.users.expire') }} minutos.</p>
-            <a href="{{ env('FRONTEND_URL', 'http://localhost:3000') }}/auth/reset-password?token={{ $token }}&email={{ urlencode($user->email) }}" class="button">Establecer Contraseña</a>
+            <a href="{{ env('APP_FRONTEND_URL', 'http://localhost:5173') }}/auth/reset-password?token={{ $token }}&email={{ urlencode($user->email) }}" class="button">Establecer Contraseña</a>
             <p>Si no puedes hacer clic en el botón, copia y pega la siguiente URL en tu navegador:</p>
-            <p>{{ env('FRONTEND_URL', 'http://localhost:3000') }}/auth/reset-password?token={{ $token }}&email={{ urlencode($user->email) }}</p>
+            <p>{{ env('APP_FRONTEND_URL', 'http://localhost:5173') }}/auth/reset-password?token={{ $token }}&email={{ urlencode($user->email) }}</p>
             <p>Si no creaste esta cuenta, puedes ignorar este correo.</p>
         </div>
         <div class="footer">

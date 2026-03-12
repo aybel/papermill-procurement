@@ -154,30 +154,52 @@ class PermissionsSeeder extends Seeder
         // Rol: Jefe de Compras - Gestiona todo el proceso de compras
         $jefeComprasRole = Role::firstOrCreate(['name' => 'Jefe de Compras', 'guard_name' => $guardName]);
         $jefeComprasRole->syncPermissions([
-            'suppliers.view_any', 'suppliers.view', 'suppliers.create', 'suppliers.update',
-            'materials.view_any', 'materials.view', 'materials.create', 'materials.update',
-            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.create',
-            'budget_requests.update', 'budget_requests.delete',
-            'budget_assignments.view_any', 'budget_assignments.view',
-            'departments.view_any', 'departments.view',
+            'suppliers.view_any',
+            'suppliers.view',
+            'suppliers.create',
+            'suppliers.update',
+            'materials.view_any',
+            'materials.view',
+            'materials.create',
+            'materials.update',
+            'budget_requests.view_any',
+            'budget_requests.view',
+            'budget_requests.create',
+            'budget_requests.update',
+            'budget_requests.delete',
+            'budget_assignments.view_any',
+            'budget_assignments.view',
+            'departments.view_any',
+            'departments.view',
         ]);
 
         // Rol: Comprador - Ejecuta órdenes de compra
         $compradorRole = Role::firstOrCreate(['name' => 'Comprador', 'guard_name' => $guardName]);
         $compradorRole->syncPermissions([
-            'suppliers.view_any', 'suppliers.view',
-            'materials.view_any', 'materials.view',
-            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.create',
-            'budget_assignments.view_any', 'budget_assignments.view',
+            'suppliers.view_any',
+            'suppliers.view',
+            'materials.view_any',
+            'materials.view',
+            'budget_requests.view_any',
+            'budget_requests.view',
+            'budget_requests.create',
+            'budget_assignments.view_any',
+            'budget_assignments.view',
         ]);
 
         // Rol: Jefe de Departamento - Gestiona su departamento
         $jefeDepartamentoRole = Role::firstOrCreate(['name' => 'Jefe de Departamento', 'guard_name' => $guardName]);
         $jefeDepartamentoRole->syncPermissions([
-            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.create', 'budget_requests.update',
-            'budget_assignments.view_any', 'budget_assignments.view',
-            'materials.view_any', 'materials.view',
-            'departments.view_any', 'departments.view',
+            'budget_requests.view_any',
+            'budget_requests.view',
+            'budget_requests.create',
+            'budget_requests.update',
+            'budget_assignments.view_any',
+            'budget_assignments.view',
+            'materials.view_any',
+            'materials.view',
+            'departments.view_any',
+            'departments.view',
         ]);
 
         // Rol: Empleado - Solo lectura básica
@@ -190,19 +212,26 @@ class PermissionsSeeder extends Seeder
         // Rol: Operativo - Ejecuta operaciones básicas
         $operativoRole = Role::firstOrCreate(['name' => 'Operativo', 'guard_name' => $guardName]);
         $operativoRole->syncPermissions([
-            'suppliers.view_any', 'suppliers.view',
-            'materials.view_any', 'materials.view',
-            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.create',
-            'budget_assignments.view_any', 'budget_assignments.view',
-            'departments.view_any', 'departments.view',
+            'materials.view_any',
+            'budget_requests.view_any',
+            'budget_requests.view',
+            'budget_requests.create',
+            'budget_requests.update',
+            'budget_requests.delete',
+            'departments.view_any',
+            'departments.view',
         ]);
 
         // Rol: Aprobador - Aprueba solicitudes
         $aprobadorRole = Role::firstOrCreate(['name' => 'Aprobador', 'guard_name' => $guardName]);
         $aprobadorRole->syncPermissions([
-            'budget_requests.view_any', 'budget_requests.view', 'budget_requests.update',
-            'budget_assignments.view_any', 'budget_assignments.view',
-            'departments.view_any', 'departments.view',
+            'budget_requests.view_any',
+            'budget_requests.view',
+            'budget_requests.update',
+            'budget_assignments.view_any',
+            'budget_assignments.view',
+            'departments.view_any',
+            'departments.view',
         ]);
 
         $this->command->info('✓ Roles del ERP creados: Jefe de Compras, Comprador, Jefe de Departamento, Empleado, Operativo, Aprobador');
