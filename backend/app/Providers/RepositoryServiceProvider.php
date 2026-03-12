@@ -35,6 +35,10 @@ use App\Repositories\BudgetRequestItemRepositoryInterface;
 use App\Repositories\BudgetRequestItemRepository;
 use App\Repositories\BudgetCategoryRepositoryInterface;
 use App\Repositories\BudgetCategoryRepository;
+use App\Repositories\PermissionRepositoryInterface;
+use App\Repositories\PermissionRepository;
+use App\Repositories\MenuRepositoryInterface;
+use App\Repositories\MenuRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -121,6 +125,16 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             BudgetCategoryRepositoryInterface::class,
             BudgetCategoryRepository::class
+        );
+
+        $this->app->bind(
+            PermissionRepositoryInterface::class,
+            PermissionRepository::class
+        );
+
+        $this->app->bind(
+            MenuRepositoryInterface::class,
+            MenuRepository::class
         );
     }
 

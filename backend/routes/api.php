@@ -1,27 +1,28 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\SupplierTypeController;
-use App\Http\Controllers\SupplierStatusController;
-use App\Http\Controllers\CurrencyController;
-use App\Http\Controllers\PaymentTermController;
-use App\Http\Controllers\SupplierContactController;
-use App\Http\Controllers\MaterialTypeController;
-use App\Http\Controllers\MaterialCategoryController;
-use App\Http\Controllers\UnitOfMeasureController;
-use App\Http\Controllers\BudgetCategoryController;
 use App\Http\Controllers\BudgetAssignmentController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\BudgetRequestStatusController;
+use App\Http\Controllers\BudgetCategoryController;
 use App\Http\Controllers\BudgetRequestController;
 use App\Http\Controllers\BudgetRequestItemController;
+use App\Http\Controllers\BudgetRequestStatusController;
+use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\MaterialCategoryController;
+use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\MaterialTypeController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\PaymentTermController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SupplierContactController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SupplierStatusController;
+use App\Http\Controllers\SupplierTypeController;
+use App\Http\Controllers\UnitOfMeasureController;
+use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::post('auth/register', [AuthController::class, 'register']);
@@ -198,12 +199,16 @@ Route::prefix('v1')->group(function () {
 
         // Rutas para Roles y Permisos (protegidas)
         Route::middleware('permission:roles.manage')->group(function () {
+            Route::get('/permissions/search', [PermissionController::class, 'search']);
             Route::get('/permissions', [PermissionController::class, 'index']);
             Route::apiResource('roles', RoleController::class);
 
             // Asignar/revocar permisos a roles
             Route::post('/roles/{role}/permissions', [RoleController::class, 'assignPermissions']);
             Route::delete('/roles/{role}/permissions', [RoleController::class, 'revokePermission']);
+
+            //Menu
+            Route::get('/user/menu', [MenuController::class, 'getUserMenu']);
         });
 
         // Rutas para gestión de usuarios
