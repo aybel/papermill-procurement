@@ -12,9 +12,7 @@ interface PermissionRepositoryInterface
     public function getAll(): Collection;
 
     /**
-     * Buscar permisos por nombre y filtros adicionales.
-     * Filtros soportados:
-     *   - resource: valor exacto, o la cadena "NOT NULL" para whereNotNull.
+     * Buscar permisos por nombre.
      * @param array $orderBy  Ej: ['column' => 'name', 'direction' => 'asc']
      */
     public function search(string $search, array $filters = [], array $orderBy = []): Collection;

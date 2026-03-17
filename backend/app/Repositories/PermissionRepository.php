@@ -27,15 +27,7 @@ class PermissionRepository implements PermissionRepositoryInterface
             $query->where('name', 'like', "%{$search}%");
         }
 
-        if (isset($filters['resource'])) {
-            if (strtoupper($filters['resource']) === 'NOT NULL') {
-                $query->whereNotNull('resource');
-            } else {
-                $query->where('resource', $filters['resource']);
-            }
-        }
-
-        $allowedColumns = ['name', 'resource', 'action', 'category', 'created_at'];
+        $allowedColumns = ['name', 'created_at'];
         $column    = in_array($orderBy['column'] ?? null, $allowedColumns, true)
             ? $orderBy['column']
             : 'name';

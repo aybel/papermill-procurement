@@ -10,11 +10,6 @@ class Permission extends SpatiePermission
     protected $fillable = [
         'name',
         'guard_name',
-        'resource',
-        'action',
-        'category',
-        'description',
-        'icon',
     ];
 
     public function menuItems(): HasMany

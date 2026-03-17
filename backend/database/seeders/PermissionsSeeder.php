@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
-use App\Models\User;
 
 class PermissionsSeeder extends Seeder
 {
@@ -22,14 +21,14 @@ class PermissionsSeeder extends Seeder
 
         // create permissions
         $permissions = [
-            // Suppliers
-            'suppliers.view_any',
-            'suppliers.view',
-            'suppliers.create',
-            'suppliers.update',
-            'suppliers.delete',
-            'suppliers.restore',
-            'suppliers.update_scores',
+            // supplier
+            'supplier.view_any',
+            'supplier.view',
+            'supplier.create',
+            'supplier.update',
+            'supplier.delete',
+            'supplier.restore',
+            'supplier.update_scores',
             // Supplier types
             'supplier_types.view_any',
             'supplier_types.view',
@@ -60,11 +59,26 @@ class PermissionsSeeder extends Seeder
             'supplier_contacts.create',
             'supplier_contacts.update',
             'supplier_contacts.delete',
-            // Roles & Permissions
-            'roles.manage',
+            // supplier performance
+            'supplier_performance.view_any',
+            // Roles
+            'roles.view_any',
+            'roles.view',
+            'roles.create',
+            'roles.update',
+            'roles.delete',
+            // Permissions
+            'permissions.view_any',
             'permissions.view',
+            'permissions.create',
+            'permissions.update',
+            'permissions.delete',
             // Users
-            'users.manage',
+            'users.view_any',
+            'users.view',
+            'users.create',
+            'users.update',
+            'users.delete',
             // Materials
             'materials.view_any',
             'materials.view',
@@ -125,6 +139,9 @@ class PermissionsSeeder extends Seeder
             'budget_request_items.create',
             'budget_request_items.update',
             'budget_request_items.delete',
+            //budget-my-budget
+            'budget-my_budget.view_any',
+
 
         ];
 
@@ -154,10 +171,10 @@ class PermissionsSeeder extends Seeder
         // Rol: Jefe de Compras - Gestiona todo el proceso de compras
         $jefeComprasRole = Role::firstOrCreate(['name' => 'Jefe de Compras', 'guard_name' => $guardName]);
         $jefeComprasRole->syncPermissions([
-            'suppliers.view_any',
-            'suppliers.view',
-            'suppliers.create',
-            'suppliers.update',
+            'supplier.view_any',
+            'supplier.view',
+            'supplier.create',
+            'supplier.update',
             'materials.view_any',
             'materials.view',
             'materials.create',
@@ -176,8 +193,8 @@ class PermissionsSeeder extends Seeder
         // Rol: Comprador - Ejecuta órdenes de compra
         $compradorRole = Role::firstOrCreate(['name' => 'Comprador', 'guard_name' => $guardName]);
         $compradorRole->syncPermissions([
-            'suppliers.view_any',
-            'suppliers.view',
+            'supplier.view_any',
+            'supplier.view',
             'materials.view_any',
             'materials.view',
             'budget_requests.view_any',

@@ -29,17 +29,12 @@ class PermissionController extends Controller
         try {
             $search = $request->input('q', '');
 
-            $filters = [];
-            if ($request->has('resource')) {
-                $filters['resource'] = $request->input('resource');
-            }
-
             $orderBy = $request->input('order_by', []);
             if (is_string($orderBy)) {
                 $orderBy = json_decode($orderBy, true) ?? [];
             }
 
-            $permissions = $this->permissionRepository->search($search, $filters, $orderBy);
+            $permissions = $this->permissionRepository->search($search, [], $orderBy);
 
             return response()->json([
                 'success' => true,

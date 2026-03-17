@@ -38,7 +38,6 @@ class DatabaseSeeder extends Seeder
 
             // 4. Permisos y otros seeders
             PermissionsSeeder::class,
-            UpdatePermissionDetailsSeeder::class,
 
             // 5. Categorías de materiales con sus atributos específicos
             MaterialCategorySeeder::class,
@@ -58,6 +57,9 @@ class DatabaseSeeder extends Seeder
 
             // 10. Asignaciones de presupuesto (requiere usuarios creados)
             BudgetAssignmentSeeder::class,
+
+            // 11. Menús y submenús (requiere permisos creados)
+            MenuSeeder::class,
 
         ]);
 
