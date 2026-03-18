@@ -197,23 +197,24 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}', [UnitOfMeasureController::class, 'destroy'])->middleware('permission:units_of_measure.delete');
         });
 
-        // Rutas para Roles y Permisos (protegidas)
-        Route::middleware('permissions')->group(function () {
+        // Rutas para permisos (protegidas)
+        Route::prefix('permissions')->group(function () {
             Route::get('search', [PermissionController::class, 'search'])->middleware('permission:permissions.view_any');
             Route::get('/', [PermissionController::class, 'index'])->middleware('permission:permissions.view_any');
             Route::get('/{id}', [PermissionController::class, 'show'])->middleware('permission:permissions.view');
             Route::post('/', [PermissionController::class, 'store'])->middleware('permission:permissions.create');
             Route::put('/{id}', [PermissionController::class, 'update'])->middleware('permission:permissions.update');
         });
-        Route::middleware('users')->group(function () {
-            Route::get('menu', [MenuController::class, 'getUserMenu']);
-            Route::get('search', [UserController::class, 'search'])->middleware('permission:users.view_any');
+        Route::get('menu', [MenuController::class, 'getUserMenu']);
+        Route::prefix('users')->group(function () {
+
+            Route::get('search', [UserController::class, 'search']);
             Route::get('/', [UserController::class, 'index'])->middleware('permission:users.view_any');
             Route::get('/{id}', [UserController::class, 'show'])->middleware('permission:users.view');
             Route::post('/', [UserController::class, 'store'])->middleware('permission:users.create');
             Route::put('/{id}', [UserController::class, 'update'])->middleware('permission:users.update');
         });
-        Route::middleware('roles')->group(function () {
+        Route::prefix('roles')->group(function () {
             Route::get('search', [RoleController::class, 'search'])->middleware('permission:roles.view_any');
             Route::get('/', [RoleController::class, 'index'])->middleware('permission:roles.view_any');
             Route::get('/{id}', [RoleController::class, 'show'])->middleware('permission:roles.view');

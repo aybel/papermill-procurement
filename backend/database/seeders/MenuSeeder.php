@@ -8,13 +8,27 @@ use Illuminate\Database\Seeder;
 
 class MenuSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         // Mapeo de permisos existentes
         $permissions = Permission::all()->keyBy('name');
 
-        // 1. Headers principales
-        $headerPrincipal = MenuItem::create([
+        $permissionId = function ($names) use ($permissions): ?int {
+            foreach ((array) $names as $name) {
+                $permission = $permissions->get($name);
+                if ($permission) {
+                    return $permission->id;
+                }
+            }
+
+            return null;
+        };
+
+        // Permite ejecutar el seeder varias veces sin colisiones por semantic_key
+        MenuItem::query()->delete();
+
+        // 1. Header principal
+        MenuItem::create([
             'semantic_key' => 'header.main',
             'display_name' => 'Principal',
             'semantic_type' => 'header',
@@ -28,323 +42,338 @@ class MenuSeeder extends Seeder
             'route_name' => 'dashboard',
             'semantic_icon' => 'dashboard',
             'semantic_type' => 'module',
-            'permission_id' => $permissions['dashboard.view']->id ?? null,
+            'permission_id' => $permissionId('dashboard.view'),
             'order' => 2,
         ]);
 
-        // 3. Header Proveedores
-        $headerProveedores = MenuItem::create([
+        // 3. Header Proveedores////////////////////////////////////////////////////////
+        MenuItem::create([
             'semantic_key' => 'header.suppliers',
             'display_name' => 'Gestión de Proveedores',
             'semantic_type' => 'header',
             'order' => 10,
         ]);
 
-        // 4. Módulo Proveedores
+        // 4. Modulo Proveedores////////////////////////////////////////////////////////
         $suppliersModule = MenuItem::create([
-            'parent_id' => $headerProveedores->id,
-            'semantic_key' => 'module.suppliers',
+            'semantic_key' => 'module.suppliers.management',
             'display_name' => 'Proveedores',
-            'route_name' => 'suppliers.index',
+            'route_name' => 'suppliers',
             'semantic_icon' => 'supplier',
-            'semantic_type' => 'link',
-            'permission_id' => $permissions['suppliers.view_any']->id ?? null,
+            'semantic_type' => 'module',
+            'permission_id' => $permissionId(['suppliers.view_any', 'supplier.view_any']),
             'order' => 11,
         ]);
 
-        // 5. Submódulos de Proveedores
+        // 5. Submodulos Proveedores
+        MenuItem::create([
+            'parent_id' => $suppliersModule->id,
+            'semantic_key' => 'module.suppliers',
+            'display_name' => 'Lista de Proveedores',
+            'route_name' => 'suppliers',
+            'semantic_icon' => 'contact',
+            'semantic_type' => 'link',
+            'permission_id' => $permissionId('supplier_contacts.view_any'),
+            'order' => 1,
+        ]);
+
+        // 5. Submodulos Proveedores
         MenuItem::create([
             'parent_id' => $suppliersModule->id,
             'semantic_key' => 'module.suppliers.contacts',
             'display_name' => 'Contactos',
-            'route_name' => 'supplier-contacts.index',
+            'route_name' => 'supplier-contacts',
             'semantic_icon' => 'contact',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['supplier_contacts.view_any']->id ?? null,
-            'order' => 1,
+            'permission_id' => $permissionId('supplier_contacts.view_any'),
+            'order' => 2,
         ]);
 
         MenuItem::create([
             'parent_id' => $suppliersModule->id,
             'semantic_key' => 'module.suppliers.performance',
             'display_name' => 'Desempeño',
-            'route_name' => 'supplier-performance.index',
+            'route_name' => 'supplier-performance',
             'semantic_icon' => 'chart',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['supplier_performance.view_any']->id ?? null,
-            'order' => 2,
-        ]);
-
-        // Materiales////////////////////////////////////////////////////////////////////////////////////////////
-        $Materials = MenuItem::create([
-            'semantic_key' => 'module.materials',
-            'display_name' => 'Gestión de Materiales',
-            'route_name' => '#',
-            'semantic_icon' => 'budget',
-            'semantic_type' => 'module',
-            'permission_id' => $permissions['materials.view_any']->id ?? null,
-            'order' => 12,
-        ]);
-        // Submódulo de Materiales
-        MenuItem::create([
-            'parent_id' => $Materials->id,
-            'semantic_key' => 'module.materials.view_any',
-            'display_name' => 'Materiales',
-            'route_name' => 'materials.index',
-            'semantic_icon' => 'list',
-            'semantic_type' => 'link',
-            'permission_id' => $permissions['materials.view_any']->id ?? null,
-            'order' => 1,
-        ]);
-        // Fin Materiales///////////////////////////////////////////////////////////////////////////////////////////
-
-        //Gestión de presupuestos///////////////////////////////////////////////////////////////////////////////////
-
-        $Presupuestos = MenuItem::create([
-            'semantic_key' => 'module.budget',
-            'display_name' => 'Gestión de Presupuestos',
-            'route_name' => '#',
-            'semantic_icon' => 'budget',
-            'semantic_type' => 'module',
-            'permission_id' => ($permissions['budget_categories.view_any']->id ?? null) || ($permissions['budget_assignments.view_any']->id ?? null) || ($permissions['budget_requests.view_any']->id ?? null),
-            'order' => 13,
-        ]);
-        // Submódulo de presupuestos
-        MenuItem::create([
-            'parent_id' => $Presupuestos->id,
-            'semantic_key' => 'module.budget_categories.view_any',
-            'display_name' => 'Rubros',
-            'route_name' => 'budget-categories.index',
-            'semantic_icon' => 'list',
-            'semantic_type' => 'link',
-            'permission_id' => $permissions['budget_categories.view_any']->id ?? null,
-            'order' => 1,
-        ]);
-        //submodulos Asignación de presupuestos
-        MenuItem::create([
-            'parent_id' => $Presupuestos->id,
-            'semantic_key' => 'module.budget_assignments.view_any',
-            'display_name' => 'Asignación',
-            'route_name' => 'budget-assignments.index',
-            'semantic_icon' => 'list',
-            'semantic_type' => 'link',
-            'permission_id' => $permissions['budget_assignments.view_any']->id ?? null,
-            'order' => 2,
-        ]);
-        //Submodulo de calendarización
-        MenuItem::create([
-            'parent_id' => $Presupuestos->id,
-            'semantic_key' => 'module.budget_requests.view_any',
-            'display_name' => 'Solicitudes de calendarización',
-            'route_name' => 'budget-requests.index',
-            'semantic_icon' => 'calendar',
-            'semantic_type' => 'link',
-            'permission_id' => $permissions['budget_requests.view_any']->id ?? null,
+            'permission_id' => $permissionId('supplier_performance.view_any'),
             'order' => 3,
         ]);
-        //Submodulo de mi presupuesto
-        MenuItem::create([
-            'parent_id' => $Presupuestos->id,
-            'semantic_key' => 'module.budget-my-budget.view_any',
-            'display_name' => 'Mi presupuesto',
-            'route_name' => 'budget-requests.index',
-            'semantic_icon' => 'calendar',
-            'semantic_type' => 'link',
-            'permission_id' => $permissions['budget-my-budget.view_any']->id ?? null,
-            'order' => 4,
-        ]);
-        //Termina Gestión de presupuestos////////////////////////////////////////////////////////////////////////////////
 
-        //Gestión de catalogos/////////////////////////////////////////////////////////////////////////////////////////////
-        $Catalogos = MenuItem::create([
-            'semantic_key' => 'module.catalogs',
-            'display_name' => 'Gestión de Catálogos',
+        // 3. Header Materiales///////////////////////////////////////////////////////
+        MenuItem::create([
+            'semantic_key' => 'header.materials',
+            'display_name' => 'Gestión de Materiales',
+            'semantic_type' => 'header',
+            'order' => 12,
+        ]);
+
+        // 6. Modulo Materiales////////////////////////////////////////////////////////
+        $materialsModule = MenuItem::create([
+            'semantic_key' => 'module.materials.management',
+            'display_name' => 'Materiales',
             'route_name' => '#',
-            'semantic_icon' => 'catalogs',
+            'semantic_icon' => 'materials',
             'semantic_type' => 'module',
-            'permission_id' => ($permissions['currencies.view_any']->id ?? null) || ($permissions['payment_terms.view_any']->id ?? null),
+            'permission_id' => $permissionId('materials.view_any'),
+            'order' => 13,
+        ]);
+
+        MenuItem::create([
+            'parent_id' => $materialsModule->id,
+            'semantic_key' => 'module.materials',
+            'display_name' => 'Lista de Materiales',
+            'route_name' => 'materials',
+            'semantic_icon' => 'list',
+            'semantic_type' => 'link',
+            'permission_id' => $permissionId('materials.view_any'),
+            'order' => 1,
+        ]);
+
+        // 3. Header Presupuestos///////////////////////////////////////////////////////
+        MenuItem::create([
+            'semantic_key' => 'header.budget',
+            'display_name' => 'Gestión de Presupuestos',
+            'semantic_type' => 'header',
             'order' => 14,
         ]);
 
-        //Monedas
+        $budgetModule = MenuItem::create([
+            'semantic_key' => 'module.budget.management',
+            'display_name' => 'Presupuesto',
+            'route_name' => '#',
+            'semantic_icon' => 'budget',
+            'semantic_type' => 'module',
+            'permission_id' => $permissionId([
+                'budget_categories.view_any',
+                'budget_assignments.view_any',
+                'budget_requests.view_any',
+                'budget-my_budget.view_any',
+                'budget-my-budget.view_any',
+            ]),
+            'order' => 15,
+        ]);
+
         MenuItem::create([
-            'parent_id' => $Catalogos->id,
-            'semantic_key' => 'module.catalogs.currencies',
+            'parent_id' => $budgetModule->id,
+            'semantic_key' => 'module.budget.categories',
+            'display_name' => 'Rubros',
+            'route_name' => 'budget-categories',
+            'semantic_icon' => 'list',
+            'semantic_type' => 'link',
+            'permission_id' => $permissionId('budget_categories.view_any'),
+            'order' => 2,
+        ]);
+
+        MenuItem::create([
+            'parent_id' => $budgetModule->id,
+            'semantic_key' => 'module.budget.assignments',
+            'display_name' => 'Asignación',
+            'route_name' => 'budget-assignments',
+            'semantic_icon' => 'list',
+            'semantic_type' => 'link',
+            'permission_id' => $permissionId('budget_assignments.view_any'),
+            'order' => 3,
+        ]);
+
+        MenuItem::create([
+            'parent_id' => $budgetModule->id,
+            'semantic_key' => 'module.budget.requests',
+            'display_name' => 'Solicitudes de calendarización',
+            'route_name' => 'budget-requests',
+            'semantic_icon' => 'calendar',
+            'semantic_type' => 'link',
+            'permission_id' => $permissionId('budget_requests.view_any'),
+            'order' => 4,
+        ]);
+
+        MenuItem::create([
+            'parent_id' => $budgetModule->id,
+            'semantic_key' => 'module.budget.my_budget',
+            'display_name' => 'Mi presupuesto',
+            'route_name' => 'budget-requests',
+            'semantic_icon' => 'calendar',
+            'semantic_type' => 'link',
+            'permission_id' => $permissionId(['budget-my_budget.view_any', 'budget-my-budget.view_any']),
+            'order' => 5,
+        ]);
+
+        // 8. Header Configuración////////////////////////////////////////////////////////////////////////////////////
+        MenuItem::create([
+            'semantic_key' => 'header.config',
+            'display_name' => 'Configuración',
+            'semantic_type' => 'header',
+            'order' => 40,
+        ]);
+
+        // 9. Modulo Configuración
+        $configModule = MenuItem::create([
+            'semantic_key' => 'module.config',
+            'display_name' => 'Configuración',
+            'route_name' => '#',
+            'semantic_icon' => 'settings',
+            'semantic_type' => 'module',
+            'permission_id' => $permissionId([
+                'currencies.view_any',
+                'payment_terms.view_any',
+                'supplier_types.view_any',
+                'material_categories.view_any',
+                'material_types.view_any',
+                'units_of_measure.view_any',
+                'departments.view_any',
+            ]),
+            'order' => 41,
+        ]);
+
+        MenuItem::create([
+            'parent_id' => $configModule->id,
+            'semantic_key' => 'module.config.currencies',
             'display_name' => 'Monedas',
-            'route_name' => 'currencies.index',
+            'route_name' => 'currencies',
             'semantic_icon' => 'currency',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['currencies.view_any']->id ?? null,
+            'permission_id' => $permissionId('currencies.view_any'),
             'order' => 1,
         ]);
 
-        //Terminos de pago
         MenuItem::create([
-            'parent_id' => $Catalogos->id,
-            'semantic_key' => 'module.catalogs.payment_terms',
+            'parent_id' => $configModule->id,
+            'semantic_key' => 'module.config.payment_terms',
             'display_name' => 'Términos de pago',
-            'route_name' => 'payment-terms.index',
+            'route_name' => 'payment-terms',
             'semantic_icon' => 'payment',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['payment_terms.view_any']->id ?? null,
+            'permission_id' => $permissionId('payment_terms.view_any'),
             'order' => 2,
         ]);
-        //Tipos de proveedores
+
         MenuItem::create([
-            'parent_id' => $Catalogos->id,
-            'semantic_key' => 'module.catalogs.supplier_types',
+            'parent_id' => $configModule->id,
+            'semantic_key' => 'module.config.supplier_types',
             'display_name' => 'Tipos de proveedores',
-            'route_name' => 'supplier-types.index',
+            'route_name' => 'supplier-types',
             'semantic_icon' => 'supplier-type',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['supplier_types.view_any']->id ?? null,
+            'permission_id' => $permissionId('supplier_types.view_any'),
             'order' => 3,
         ]);
-        //Categoria de materiales
+
         MenuItem::create([
-            'parent_id' => $Catalogos->id,
-            'semantic_key' => 'module.catalogs.material_categories',
+            'parent_id' => $configModule->id,
+            'semantic_key' => 'module.config.material_categories',
             'display_name' => 'Categoría de materiales',
-            'route_name' => 'material-categories.index',
-            'semantic_icon' => 'material-category',
+            'route_name' => 'material-categories',
+            'semantic_icon' => 'material-categories',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['material_categories.view_any']->id ?? null,
+            'permission_id' => $permissionId('material_categories.view_any'),
             'order' => 4,
         ]);
-        //Tipos de materiales
+
         MenuItem::create([
-            'parent_id' => $Catalogos->id,
-            'semantic_key' => 'module.catalogs.material_types',
+            'parent_id' => $configModule->id,
+            'semantic_key' => 'module.config.material_types',
             'display_name' => 'Tipos de materiales',
-            'route_name' => 'material-types.index',
-            'semantic_icon' => 'material-type',
+            'route_name' => 'material-types',
+            'semantic_icon' => 'material-types',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['material_types.view_any']->id ?? null,
+            'permission_id' => $permissionId('material_types.view_any'),
             'order' => 5,
         ]);
-        //Unidad de medida
+
         MenuItem::create([
-            'parent_id' => $Catalogos->id,
-            'semantic_key' => 'module.catalogs.units_of_measure',
+            'parent_id' => $configModule->id,
+            'semantic_key' => 'module.config.units_of_measure',
             'display_name' => 'Unidades de medida',
-            'route_name' => 'units_of_measure.index',
+            'route_name' => 'units-of-measure',
             'semantic_icon' => 'unit',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['units_of_measure.view_any']->id ?? null,
+            'permission_id' => $permissionId('units_of_measure.view_any'),
             'order' => 6,
         ]);
-        //Departamentos
+
         MenuItem::create([
-            'parent_id' => $Catalogos->id,
-            'semantic_key' => 'module.catalogs.departments',
+            'parent_id' => $configModule->id,
+            'semantic_key' => 'module.config.departments',
             'display_name' => 'Departamentos',
-            'route_name' => 'departments.index',
+            'route_name' => 'departments',
             'semantic_icon' => 'department',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['departments.view_any']->id ?? null,
+            'permission_id' => $permissionId('departments.view_any'),
             'order' => 7,
         ]);
 
-        //Gestion de usuarios////////////////////////////////////////////////////////////////////////////////////////////
-        $Usuarios = MenuItem::create([
+        // 10. Header Administración ////////////////////////////////////////////////////////////////////////////////////
+        MenuItem::create([
+            'semantic_key' => 'header.administration',
+            'display_name' => 'Administración',
+            'semantic_type' => 'header',
+            'order' => 42,
+        ]);
+
+        // 11. Modulo Usuarios
+        $usersModule = MenuItem::create([
             'semantic_key' => 'module.users',
-            'display_name' => 'Gestión de Usuarios',
+            'display_name' => 'Usuarios',
             'route_name' => '#',
             'semantic_icon' => 'users',
             'semantic_type' => 'module',
-            'permission_id' => ($permissions['users.view_any']->id) ?? null,
-            'order' => 15,
+            'permission_id' => $permissionId('users.view_any'),
+            'order' => 43,
         ]);
+
         MenuItem::create([
-            'parent_id' => $Usuarios->id,
+            'parent_id' => $usersModule->id,
             'semantic_key' => 'module.users.manage',
-            'display_name' => 'Usuarios',
-            'route_name' => 'users.index',
+            'display_name' => 'Lista  de Usuarios',
+            'route_name' => 'users',
             'semantic_icon' => 'user',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['users.view_any']->id ?? null,
+            'permission_id' => $permissionId('users.view_any'),
             'order' => 1,
         ]);
-        //Gestion de roles
-        $Roles = MenuItem::create([
+
+        // 12. Modulo Roles
+        $rolesModule = MenuItem::create([
             'semantic_key' => 'module.roles',
-            'display_name' => 'Gestión de Roles',
-            'route_name' => '#',
-            'semantic_icon' => 'shield',
-            'semantic_type' => 'module',
-            'permission_id' => ($permissions['roles.view_any']->id) ?? null,
-            'order' => 16,
-        ]);
-        MenuItem::create([
-            'parent_id' => $Roles->id,
-            'semantic_key' => 'module.roles.manage',
             'display_name' => 'Roles',
-            'route_name' => 'roles.index',
+            'route_name' => '#',
+            'semantic_icon' => 'shield',
+            'semantic_type' => 'module',
+            'permission_id' => $permissionId('roles.view_any'),
+            'order' => 44,
+        ]);
+
+        MenuItem::create([
+            'parent_id' => $rolesModule->id,
+            'semantic_key' => 'module.roles.manage',
+            'display_name' => 'Lista de Roles',
+            'route_name' => 'roles',
             'semantic_icon' => 'shield',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['roles.view_any']->id ?? null,
+            'permission_id' => $permissionId('roles.view_any'),
             'order' => 1,
         ]);
-        //Gestion de permisos
-        $Permisos = MenuItem::create([
+
+        // 13. Modulo Permisos
+        $permissionsModule = MenuItem::create([
             'semantic_key' => 'module.permissions',
-            'display_name' => 'Gestión de Permisos',
+            'display_name' => 'Permisos',
             'route_name' => '#',
             'semantic_icon' => 'key',
             'semantic_type' => 'module',
-            'permission_id' => ($permissions['permissions.view_any']->id) ?? null,
-            'order' => 17,
+            'permission_id' => $permissionId('permissions.view_any'),
+            'order' => 45,
         ]);
+
         MenuItem::create([
-            'parent_id' => $Permisos->id,
+            'parent_id' => $permissionsModule->id,
             'semantic_key' => 'module.permissions.manage',
-            'display_name' => 'Permisos',
-            'route_name' => 'permissions.index',
+            'display_name' => 'Lista de Permisos',
+            'route_name' => 'permissions',
             'semantic_icon' => 'key',
             'semantic_type' => 'link',
-            'permission_id' => $permissions['permissions.view_any']->id ?? null,
+            'permission_id' => $permissionId('permissions.view_any'),
             'order' => 1,
         ]);
-        //Termina Gestión de usuarios////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // // Ejemplo para Configuración con hijos
-        // $configModule = MenuItem::create([
-        //     'semantic_key' => 'module.config',
-        //     'display_name' => 'Configuración',
-        //     'route_name' => '#',
-        //     'semantic_icon' => 'settings',
-        //     'semantic_type' => 'module',
-        //     'permission_id' => $permissions['catalogs.view_any']->id ?? null,
-        //     'order' => 100,
-        // ]);
-
-        // MenuItem::create([
-        //     'parent_id' => $configModule->id,
-        //     'semantic_key' => 'module.config.currencies',
-        //     'display_name' => 'Monedas',
-        //     'route_name' => 'currencies.index',
-        //     'semantic_icon' => 'currency',
-        //     'semantic_type' => 'link',
-        //     'permission_id' => $permissions['currencies.view_any']->id ?? null,
-        //     'order' => 1,
-        // ]);
     }
 }
