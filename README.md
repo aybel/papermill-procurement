@@ -26,6 +26,56 @@ Papermill Procurement es una solución integral para la gestión de compras y ap
 - **Nginx** - Servidor web
 - **Supervisor** - Gestor de procesos
 
+## 🏗️ Arquitectura
+
+El proyecto implementa una **arquitectura monolítica modular** sobre Laravel, con base en **MVC** y una organización en capas para separar responsabilidades.
+
+### Estilo arquitectónico
+
+- **Monolito modular**: todo el backend vive en una sola aplicación Laravel, organizado por dominios y responsabilidades.
+- **MVC (Model-View-Controller)**: patrón principal del framework para estructurar entrada HTTP, lógica de dominio y persistencia.
+- **API REST**: exposición de funcionalidades mediante endpoints versionables en rutas de API.
+
+### Capas aplicadas en el backend
+
+- **Capa de entrada (HTTP/API)**
+   - `routes/api.php`
+   - `app/Http/Controllers/`
+   - `app/Http/Requests/`
+   - `app/Http/Resources/`
+   - Responsabilidad: recibir peticiones, validar entrada, autorizar y transformar respuestas.
+
+- **Capa de aplicación (casos de uso)**
+   - `app/Services/`
+   - `app/DTOs/`
+   - `app/Policies/`
+   - Responsabilidad: coordinar reglas de negocio, orquestar procesos y aplicar políticas de acceso.
+
+- **Capa de dominio y datos**
+   - `app/Models/`
+   - `app/Repositories/`
+   - `database/migrations/`
+   - Responsabilidad: representar entidades, encapsular acceso a datos y mantener la integridad del modelo.
+
+### Beneficios de esta organización
+
+- Facilita mantenimiento y escalabilidad del código.
+- Reduce acoplamiento entre controladores y persistencia.
+- Mejora testabilidad al centralizar reglas en servicios y repositorios.
+- Permite evolucionar por módulos sin fragmentar el despliegue.
+
+### Diagrama de capas (Mermaid)
+
+```mermaid
+flowchart TB
+   CLIENTE["Cliente / Frontend"] --> API["Capa HTTP/API\nroutes + Controllers + Requests + Resources"]
+   API --> APP["Capa de Aplicacion\nServices + DTOs + Policies"]
+   APP --> DATA["Capa Dominio y Datos\nModels + Repositories"]
+   DATA --> DB[(MySQL)]
+   APP --> INFRA["Infraestructura\nAuth + Events + Queue + Cache"]
+   INFRA --> REDIS[(Redis)]
+```
+
 ## 📦 Requisitos Previos
 
 - Docker Desktop instalado
