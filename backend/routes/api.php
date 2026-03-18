@@ -189,28 +189,37 @@ Route::prefix('v1')->group(function () {
 
         // Unidades de medida
         Route::prefix('units-of-measure')->group(function () {
-            Route::get('/search', [UnitOfMeasureController::class, 'search'])->middleware('permission:units_of_measure.view_any');
+            Route::get('search', [UnitOfMeasureController::class, 'search'])->middleware('permission:units_of_measure.view_any');
             Route::get('/', [UnitOfMeasureController::class, 'index'])->middleware('permission:units_of_measure.view_any');
-            Route::get('/{id}', [UnitOfMeasureController::class, 'show'])->middleware('permission:units_of_measure.view');
+            Route::get('{id}', [UnitOfMeasureController::class, 'show'])->middleware('permission:units_of_measure.view');
             Route::post('/', [UnitOfMeasureController::class, 'store'])->middleware('permission:units_of_measure.create');
-            Route::put('/{id}', [UnitOfMeasureController::class, 'update'])->middleware('permission:units_of_measure.update');
-            Route::delete('/{id}', [UnitOfMeasureController::class, 'destroy'])->middleware('permission:units_of_measure.delete');
+            Route::put('{id}', [UnitOfMeasureController::class, 'update'])->middleware('permission:units_of_measure.update');
+            Route::delete('{id}', [UnitOfMeasureController::class, 'destroy'])->middleware('permission:units_of_measure.delete');
         });
 
         // Rutas para Roles y Permisos (protegidas)
-        Route::middleware('permission:roles.manage')->group(function () {
-            Route::get('/permissions/search', [PermissionController::class, 'search']);
-            Route::get('/permissions', [PermissionController::class, 'index']);
-            Route::apiResource('roles', RoleController::class);
-
-            // Asignar/revocar permisos a roles
-            Route::post('/roles/{role}/permissions', [RoleController::class, 'assignPermissions']);
-            Route::delete('/roles/{role}/permissions', [RoleController::class, 'revokePermission']);
-
-            //Menu
-            Route::get('/user/menu', [MenuController::class, 'getUserMenu']);
+        Route::middleware('permissions')->group(function () {
+            Route::get('search', [PermissionController::class, 'search'])->middleware('permission:permissions.view_any');
+            Route::get('/', [PermissionController::class, 'index'])->middleware('permission:permissions.view_any');
+            Route::get('/{id}', [PermissionController::class, 'show'])->middleware('permission:permissions.view');
+            Route::post('/', [PermissionController::class, 'store'])->middleware('permission:permissions.create');
+            Route::put('/{id}', [PermissionController::class, 'update'])->middleware('permission:permissions.update');
         });
-
+        Route::middleware('users')->group(function () {
+            Route::get('menu', [MenuController::class, 'getUserMenu']);
+            Route::get('search', [UserController::class, 'search'])->middleware('permission:users.view_any');
+            Route::get('/', [UserController::class, 'index'])->middleware('permission:users.view_any');
+            Route::get('/{id}', [UserController::class, 'show'])->middleware('permission:users.view');
+            Route::post('/', [UserController::class, 'store'])->middleware('permission:users.create');
+            Route::put('/{id}', [UserController::class, 'update'])->middleware('permission:users.update');
+        });
+        Route::middleware('roles')->group(function () {
+            Route::get('search', [RoleController::class, 'search'])->middleware('permission:roles.view_any');
+            Route::get('/', [RoleController::class, 'index'])->middleware('permission:roles.view_any');
+            Route::get('/{id}', [RoleController::class, 'show'])->middleware('permission:roles.view');
+            Route::post('/', [RoleController::class, 'store'])->middleware('permission:roles.create');
+            Route::put('/{id}', [RoleController::class, 'update'])->middleware('permission:roles.update');
+        });
         // Rutas para gestión de usuarios
         Route::middleware('permission:users.manage')->prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
