@@ -37,11 +37,11 @@ class BudgetRequestController extends Controller
             ]);
 
             $filters = BudgetRequestSearchDTO::fromValidated($validated);
-            $items = $this->queryService->getAll($filters);
+            $data = $this->queryService->getAll($filters);
 
             return response()->json([
                 'success' => true,
-                'data' => (new BudgetRequestCollection($items))->resolve(),
+                'data' => (new BudgetRequestCollection($data))->resolve(),
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -171,11 +171,11 @@ class BudgetRequestController extends Controller
             ]);
 
             $filters = BudgetRequestSearchDTO::fromValidated($validated);
-            $items = $this->queryService->search($filters);
+            $data = $this->queryService->search($filters);
 
             return response()->json([
                 'success' => true,
-                'data' => (new BudgetRequestCollection($items))->resolve(),
+                'data' => (new BudgetRequestCollection($data))->resolve(),
             ]);
         } catch (ValidationException $e) {
             return response()->json([
