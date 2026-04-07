@@ -15,6 +15,10 @@ class StoreBudgetRequestRequest extends FormRequest
                 'department_id' => $departmentId,
             ]);
         }
+
+        $this->merge([
+            'budget_request_status_id' => 1, // Asignar el estado "Borrador" por defecto
+        ]);
     }
 
     public function authorize(): bool
@@ -47,6 +51,7 @@ class StoreBudgetRequestRequest extends FormRequest
             'department_id.exists' => 'El departamento seleccionado no existe.',
             'budget_request_status_id.required' => 'El estado es obligatorio.',
             'budget_request_status_id.exists' => 'El estado seleccionado no existe.',
+            'budget_request_status_id.integer' => 'El estado debe ser un número entero.',
             'submitted_by.exists' => 'El usuario que envía no existe.',
             'approved_by.exists' => 'El usuario aprobador no existe.',
             'budget_category_id.exists' => 'La categoría de presupuesto seleccionada no existe.',

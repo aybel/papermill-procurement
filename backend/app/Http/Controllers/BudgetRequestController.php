@@ -38,7 +38,6 @@ class BudgetRequestController extends Controller
 
             $filters = BudgetRequestSearchDTO::fromValidated($validated);
             $data = $this->queryService->getAll($filters);
-
             return response()->json([
                 'success' => true,
                 'data' => (new BudgetRequestCollection($data))->resolve(),

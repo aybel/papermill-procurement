@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Configurar Carbon para usar español
+        Carbon::setLocale('es');
+
+        // Configurar el locale del sistema para fechas
+        setlocale(LC_TIME, 'es_MX.UTF-8', 'es_MX', 'es_ES', 'es', 'spanish');
     }
 }
