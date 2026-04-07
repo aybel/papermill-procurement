@@ -6,6 +6,17 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBudgetRequestRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        $departmentId = $this->user()?->department_id;
+
+        if ($departmentId !== null) {
+            $this->merge([
+                'department_id' => $departmentId,
+            ]);
+        }
+    }
+
     public function authorize(): bool
     {
         return true;
@@ -40,6 +51,7 @@ class StoreBudgetRequestRequest extends FormRequest
             'approved_by.exists' => 'El usuario aprobador no existe.',
             'budget_category_id.exists' => 'La categoría de presupuesto seleccionada no existe.',
             'budget_category_id.required' => 'La categoría de presupuesto es obligatoria.',
+            'budget_category_id.integer' => 'La categoría de presupuesto debe ser un número entero.',
             'submitted_at.date' => 'La fecha de envío debe ser válida.',
             'approved_at.date' => 'La fecha de aprobación debe ser válida.',
             'created.date' => 'La fecha de creación debe ser válida.',
