@@ -135,6 +135,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [MaterialCategoryController::class, 'store'])->middleware('permission:material_categories.create');
             Route::put('/{id}', [MaterialCategoryController::class, 'update'])->middleware('permission:material_categories.update');
             Route::delete('/{id}', [MaterialCategoryController::class, 'destroy'])->middleware('permission:material_categories.delete');
+            Route::post('/filter', [MaterialCategoryController::class, 'filter']);
         });
 
         // Categorías presupuestarias

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBudgetRequestRequest;
 use App\Http\Requests\UpdateBudgetRequestRequest;
 use App\Http\Resources\BudgetRequest\BudgetRequestCollection;
 use App\Http\Resources\BudgetRequest\BudgetRequestResource;
+use App\Repositories\BudgetRequestItemRepository;
 use App\Repositories\BudgetRequestRepositoryInterface;
 use App\Services\BudgetRequest\BudgetRequestQueryService;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,7 @@ class BudgetRequestController extends Controller
     public function __construct(
         private BudgetRequestRepositoryInterface $repository,
         private BudgetRequestQueryService $queryService,
+        private BudgetRequestItemRepository $itemRepository
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -95,19 +97,19 @@ class BudgetRequestController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Solicitud de presupuesto creada exitosamente',
+                'message' => 'Solicitud de presupuesto creada exitosamente.',
                 'data' => (new BudgetRequestResource($item))->resolve(),
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Errores de validación',
+                'message' => 'Errores de validación.',
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear la solicitud de presupuesto',
+                'message' => 'Error al crear la solicitud de presupuesto.',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -141,6 +143,15 @@ class BudgetRequestController extends Controller
     public function destroy(int $id): JsonResponse
     {
         try {
+            $solicitud = $this->repository->findById($id);
+            if (! $solicitud) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Solicitud de presupuesto borrada en otra sesión o no existe',
+                ], 404);
+            }
+            // Primero eliminamos los items relacionados con esta solicitud de presupuesto
+            $this->itemRepository->deleteByBudgetRequestId($id);
             $this->repository->delete($id);
 
             return response()->json([

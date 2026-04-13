@@ -37,4 +37,9 @@ interface MaterialCategoryRepositoryInterface
      * Buscar categorías por nombre.
      */
     public function search(string $search, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Filtrado avanzado con múltiples condiciones.
+     */
+    public function filter(array $filters = [], ?array $orderBy = null, ?array $pagination = null): LengthAwarePaginator;
 }

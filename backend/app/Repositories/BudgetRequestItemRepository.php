@@ -68,4 +68,9 @@ class BudgetRequestItemRepository implements BudgetRequestItemRepositoryInterfac
 
         return $query->paginate($perPage);
     }
+
+    public function deleteByBudgetRequestId(int $budgetRequestId): int
+    {
+        return $this->model->where('budget_request_id', $budgetRequestId)->delete();
+    }
 }

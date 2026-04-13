@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FilterMaterialCategoryRequest;
 use App\Http\Requests\StoreMaterialCategoryRequest;
 use App\Http\Requests\UpdateMaterialCategoryRequest;
 use App\Repositories\MaterialCategoryRepositoryInterface;
@@ -11,9 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class MaterialCategoryController extends Controller
 {
-    public function __construct(private MaterialCategoryRepositoryInterface $repository)
-    {
-    }
+    public function __construct(private MaterialCategoryRepositoryInterface $repository) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -154,6 +153,7 @@ class MaterialCategoryController extends Controller
     {
         try {
             $search = $request->input('q', '');
+
             $perPage = (int) $request->input('per_page', 15);
 
             $categories = $this->repository->search($search, $perPage);
@@ -166,6 +166,41 @@ class MaterialCategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al buscar categorías de material',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function filter(FilterMaterialCategoryRequest $request): JsonResponse
+    {
+        try {
+            $filters = $request->input('filters', []);
+            $orderBy = $request->input('order_by');
+            $pagination = $request->input('pagination', []);
+
+            $categories = $this->repository->filter($filters, $orderBy, $pagination);
+
+            return response()->json([
+                'success' => true,
+                'data' => $categories->items(),
+                'meta' => [
+                    'total' => $categories->total(),
+                    'per_page' => $categories->perPage(),
+                    'current_page' => $categories->currentPage(),
+                    'last_page' => $categories->lastPage(),
+                    'from' => $categories->firstItem(),
+                    'to' => $categories->lastItem(),
+                ]
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Errores de validación',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al filtrar categorías de material',
                 'error' => $e->getMessage(),
             ], 500);
         }
