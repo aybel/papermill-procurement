@@ -44,6 +44,7 @@ class DatabaseSeeder extends Seeder
 
             // 6. Materiales (que se asocian a categorías)
             MaterialSeeder::class,
+            AdditionalMaterialsSeeder::class, // Materiales adicionales para pruebas
 
             // 7. Departamentos y aprobadores
             DepartmentSeeder::class,
