@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMaterialTypeRequest;
 use App\Http\Requests\UpdateMaterialTypeRequest;
+use App\Http\Requests\FilterMaterialTypeRequest;
 use App\Repositories\MaterialTypeRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use App\Http\Responses\FilterResponse;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class MaterialTypeController extends Controller
 {
-    public function __construct(private MaterialTypeRepositoryInterface $repository)
-    {
-    }
+    public function __construct(private MaterialTypeRepositoryInterface $repository) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -166,6 +167,33 @@ class MaterialTypeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al buscar tipos de material',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function filter(FilterMaterialTypeRequest $request): JsonResponse
+    {
+        try {
+            $filters = $request->input('filters', []);
+            $orderBy = $request->input('order_by');
+            $pagination = $request->input('pagination', null);
+
+            $result = $this->repository->filter($filters, $orderBy, $pagination);
+
+            $response = $result instanceof LengthAwarePaginator
+                ? FilterResponse::fromPaginator($result)
+                : FilterResponse::fromCollection($result);
+            return response()->json($response->toResponse());
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Errores de validación',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al filtrar tipos de material',
                 'error' => $e->getMessage(),
             ], 500);
         }

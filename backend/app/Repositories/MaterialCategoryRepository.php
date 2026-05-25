@@ -55,7 +55,7 @@ class MaterialCategoryRepository implements MaterialCategoryRepositoryInterface
             ->orderBy('name')
             ->paginate($perPage);
     }
-    public function filter(array $filters = [], ?array $orderBy = null, ?array $pagination = null): LengthAwarePaginator
+    public function filter(array $filters = [], ?array $orderBy = null, ?array $pagination = null): LengthAwarePaginator|Collection
     {
         $query = $this->model->newQuery();
 
@@ -74,9 +74,19 @@ class MaterialCategoryRepository implements MaterialCategoryRepositoryInterface
             $query->orderBy('name', 'asc');
         }
 
-        // Aplicar paginación
+        // Caso 1: Sin paginación (traer todos)
+        if (is_null($pagination)) {
+            return $query->get();
+        }
+
+        // Caso 2: Paginación con límite personalizado
         $perPage = $pagination['limit'] ?? 15;
         $page = $pagination['page'] ?? 1;
+
+        // Caso especial: Si limit es 0 o null, traer todos
+        if ($perPage === 0 || $perPage === null) {
+            return $query->get();
+        }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }

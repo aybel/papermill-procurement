@@ -9,7 +9,8 @@ use App\Repositories\MaterialCategoryRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-
+use App\Http\Responses\FilterResponse;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 class MaterialCategoryController extends Controller
 {
     public function __construct(private MaterialCategoryRepositoryInterface $repository) {}
@@ -175,22 +176,15 @@ class MaterialCategoryController extends Controller
         try {
             $filters = $request->input('filters', []);
             $orderBy = $request->input('order_by');
-            $pagination = $request->input('pagination', []);
+            $pagination = $request->input('pagination', null);
+            // \Log::info('Filtros recibidos', ['filters' => $filters, 'order_by' => $orderBy, 'pagination' => $pagination]);
+            $result = $this->repository->filter($filters, $orderBy, $pagination);
 
-            $categories = $this->repository->filter($filters, $orderBy, $pagination);
+            $response = $result instanceof LengthAwarePaginator
+                ? FilterResponse::fromPaginator($result)
+                : FilterResponse::fromCollection($result);
 
-            return response()->json([
-                'success' => true,
-                'data' => $categories->items(),
-                'meta' => [
-                    'total' => $categories->total(),
-                    'per_page' => $categories->perPage(),
-                    'current_page' => $categories->currentPage(),
-                    'last_page' => $categories->lastPage(),
-                    'from' => $categories->firstItem(),
-                    'to' => $categories->lastItem(),
-                ]
-            ]);
+            return response()->json($response->toResponse());
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,

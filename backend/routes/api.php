@@ -120,6 +120,8 @@ Route::prefix('v1')->group(function () {
         // Tipos de materiales
         Route::prefix('material-types')->group(function () {
             Route::get('/search', [MaterialTypeController::class, 'search'])->middleware('permission:material_types.view_any');
+            Route::get('/search', [MaterialTypeController::class, 'search']);
+            Route::get('/filter', [MaterialTypeController::class, 'filter']);
             Route::get('/', [MaterialTypeController::class, 'index'])->middleware('permission:material_types.view_any');
             Route::get('/{id}', [MaterialTypeController::class, 'show'])->middleware('permission:material_types.view');
             Route::post('/', [MaterialTypeController::class, 'store'])->middleware('permission:material_types.create');
@@ -130,12 +132,13 @@ Route::prefix('v1')->group(function () {
         // Categorías de materiales
         Route::prefix('material-categories')->group(function () {
             Route::get('/search', [MaterialCategoryController::class, 'search']);
+            Route::get('/filter', [MaterialCategoryController::class, 'filter']);
+            Route::post('/filter', [MaterialCategoryController::class, 'filter']);
             Route::get('/', [MaterialCategoryController::class, 'index']);
             Route::get('/{id}', [MaterialCategoryController::class, 'show'])->middleware('permission:material_categories.view');
             Route::post('/', [MaterialCategoryController::class, 'store'])->middleware('permission:material_categories.create');
             Route::put('/{id}', [MaterialCategoryController::class, 'update'])->middleware('permission:material_categories.update');
             Route::delete('/{id}', [MaterialCategoryController::class, 'destroy'])->middleware('permission:material_categories.delete');
-            Route::post('/filter', [MaterialCategoryController::class, 'filter']);
         });
 
         // Categorías presupuestarias

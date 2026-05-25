@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FilterMaterialCategoryRequest extends FormRequest
+class FilterMaterialTypeRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,15 +15,14 @@ class FilterMaterialCategoryRequest extends FormRequest
     {
         return [
             'filters' => 'sometimes|array',
-            'filters.*.field' => 'required|string|in:id,name,parent_id,created_at,updated_at',
+            'filters.*.field' => 'required|string|in:id,name,code,is_active,created_at,updated_at',
             'filters.*.operator' => 'required|string|in:eq,ne,gt,gte,lt,lte,like,ilike,in,nin,null,notnull,between,startsWith,endsWith',
             'filters.*.value' => 'required_unless:filters.*.operator,null,notnull',
 
             'order_by' => 'sometimes|array',
-            'order_by.column' => 'required_with:order_by|string|in:id,name,parent_id,created_at,updated_at',
+            'order_by.column' => 'required_with:order_by|string|in:id,name,code,is_active,created_at,updated_at',
             'order_by.direction' => 'required_with:order_by|string|in:asc,desc',
 
-            //Hacer paginacion opcional
             'pagination' => 'sometimes|array|nullable',
             'pagination.page' => 'sometimes|integer|min:1',
             'pagination.limit' => 'sometimes|integer|min:1|max:100',
