@@ -3,11 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\MaterialCategory;
+use App\Repositories\Concerns\AppliesStructuredFilters;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class MaterialCategoryRepository implements MaterialCategoryRepositoryInterface
 {
+    use AppliesStructuredFilters;
+
     public function __construct(private MaterialCategory $model) {}
 
     public function getAll(?int $parentId = null, string $sortBy = 'name', string $sortDir = 'asc'): Collection
@@ -91,106 +94,20 @@ class MaterialCategoryRepository implements MaterialCategoryRepositoryInterface
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
-    /**
-     * Aplica los filtros al query builder
-     */
-    private function applyFilters($query, array $filters)
+    protected function getAllowedFilterFields(): array
     {
-        foreach ($filters as $filter) {
-            if (!isset($filter['field'], $filter['operator'])) {
-                continue;
-            }
-
-            $field = $filter['field'];
-            $operator = $filter['operator'];
-            $value = $filter['value'] ?? null;
-
-            // Solo permitir campos que existen en la tabla
-            if (!$this->isValidField($field)) {
-                continue;
-            }
-
-            switch ($operator) {
-                case 'eq':
-                    $query->where($field, '=', $value);
-                    break;
-
-                case 'ne':
-                    $query->where($field, '!=', $value);
-                    break;
-
-                case 'gt':
-                    $query->where($field, '>', $value);
-                    break;
-
-                case 'gte':
-                    $query->where($field, '>=', $value);
-                    break;
-
-                case 'lt':
-                    $query->where($field, '<', $value);
-                    break;
-
-                case 'lte':
-                    $query->where($field, '<=', $value);
-                    break;
-
-                case 'like':
-                    $query->where($field, 'LIKE', "%{$value}%");
-                    break;
-
-                case 'ilike':
-                    $query->where($field, 'ILIKE', "%{$value}%");
-                    break;
-
-                case 'in':
-                    $query->whereIn($field, (array) $value);
-                    break;
-
-                case 'nin':
-                    $query->whereNotIn($field, (array) $value);
-                    break;
-
-                case 'null':
-                    $query->whereNull($field);
-                    break;
-
-                case 'notnull':
-                    $query->whereNotNull($field);
-                    break;
-
-                case 'between':
-                    if (is_array($value) && count($value) === 2) {
-                        $query->whereBetween($field, $value);
-                    }
-                    break;
-
-                case 'startsWith':
-                    $query->where($field, 'LIKE', "{$value}%");
-                    break;
-
-                case 'endsWith':
-                    $query->where($field, 'LIKE', "%{$value}");
-                    break;
-            }
-        }
-
-        return $query;
-    }
-
-    /**
-     * Valida si el campo existe en la tabla
-     */
-    private function isValidField(string $field): bool
-    {
-        $allowedFields = [
+        return [
             'id',
             'name',
             'parent_id',
             'created_at',
             'updated_at'
         ];
+    }
+    protected function getBooleanFilterFields(): array
+    {
+        return [
 
-        return in_array($field, $allowedFields);
+        ];
     }
 }

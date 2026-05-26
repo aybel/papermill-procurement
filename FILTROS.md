@@ -11,6 +11,31 @@ Estandarizar un endpoint `POST /filter` por entidad con:
 - paginación
 - validación estricta de campos y operadores
 
+## Idea arquitectonica (la esencia)
+
+La esencia del sistema **no** es el trait, sino este contrato funcional:
+
+- el cliente describe filtros con `field`, `operator`, `value`
+- el backend traduce ese lenguaje a consultas SQL seguras
+- cada entidad decide que campos permite exponer
+
+El trait `AppliesStructuredFilters` solo extrae la parte repetida de traduccion de operadores. La regla de negocio sigue estando en cada repository mediante `getAllowedFilterFields()`.
+
+En otras palabras:
+
+- lo comun se centraliza: como se interpreta `eq`, `between`, `in`, etc.
+- lo especifico se mantiene por entidad: que campos se pueden filtrar
+
+Por eso esta arquitectura se usa: mantiene la semantica de filtros intacta, reduce duplicacion y evita desviaciones entre repositorios.
+
+## Responsabilidades por capa
+
+- Request: valida formato y operadores permitidos de entrada
+- Repository: decide campos permitidos y aplica orden/paginacion
+- Trait: ejecuta la traduccion estandar de operadores a query builder
+
+Separar estas responsabilidades facilita pruebas, evolucion y mantenimiento sin romper el contrato del endpoint `/filter`.
+
 ## Estructura de archivos
 
 ```text
@@ -25,6 +50,8 @@ app/
 ├── Models/
 │   └── [Entity].php
 └── Repositories/
+    ├── Concerns/
+    │   └── AppliesStructuredFilters.php
     ├── [Entity]Repository.php
     └── [Entity]RepositoryInterface.php
 
@@ -37,6 +64,136 @@ routes/
 ### 1) Extender el Repository
 
 Archivo: `app/Repositories/[Entity]Repository.php`
+
+Usar el trait `AppliesStructuredFilters` para **evitar duplicar** la lógica de operadores en cada repository.
+
+```php
+use App\Repositories\Concerns\AppliesStructuredFilters;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+class [Entity]Repository implements [Entity]RepositoryInterface
+{
+    use AppliesStructuredFilters;
+
+    // ...
+
+    public function filter(array $filters = [], ?array $orderBy = null, ?array $pagination = null): LengthAwarePaginator|Collection
+    {
+        $query = $this->model->newQuery();
+
+        if (!empty($filters)) {
+            $query = $this->applyFilters($query, $filters);
+        }
+
+        // ... ordenamiento y paginacion
+    }
+
+    /**
+     * Campos permitidos para filtrar en esta entidad.
+     */
+    protected function getAllowedFilterFields(): array
+    {
+        return ['id', 'name', 'created_at', 'updated_at'];
+    }
+}
+```
+
+### 1.1) Trait compartido de filtros
+
+Archivo: `app/Repositories/Concerns/AppliesStructuredFilters.php`
+
+Este trait centraliza `applyFilters()` y soporta los operadores `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `in`, `nin`, `null`, `notnull`, `between`, `startsWith`, `endsWith`.
+
+Su objetivo es:
+
+- eliminar duplicacion de `applyFilters()` entre repositorios
+- mantener un comportamiento uniforme de filtrado
+- conservar seguridad al validar campos permitidos con `getAllowedFilterFields()`
+
+Implementacion actual:
+
+```php
+<?php
+
+namespace App\Repositories\Concerns;
+
+trait AppliesStructuredFilters
+{
+    abstract protected function getAllowedFilterFields(): array;
+
+    protected function applyFilters($query, array $filters)
+    {
+        $allowedFields = $this->getAllowedFilterFields();
+
+        foreach ($filters as $filter) {
+            if (!isset($filter['field'], $filter['operator'])) {
+                continue;
+            }
+
+            $field = $filter['field'];
+            $operator = $filter['operator'];
+            $value = $filter['value'] ?? null;
+
+            if (!in_array($field, $allowedFields, true)) {
+                continue;
+            }
+
+            switch ($operator) {
+                case 'eq':
+                    $query->where($field, '=', $value);
+                    break;
+                case 'ne':
+                    $query->where($field, '!=', $value);
+                    break;
+                case 'gt':
+                    $query->where($field, '>', $value);
+                    break;
+                case 'gte':
+                    $query->where($field, '>=', $value);
+                    break;
+                case 'lt':
+                    $query->where($field, '<', $value);
+                    break;
+                case 'lte':
+                    $query->where($field, '<=', $value);
+                    break;
+                case 'like':
+                    $query->where($field, 'LIKE', "%{$value}%");
+                    break;
+                case 'ilike':
+                    $query->where($field, 'ILIKE', "%{$value}%");
+                    break;
+                case 'in':
+                    $query->whereIn($field, (array) $value);
+                    break;
+                case 'nin':
+                    $query->whereNotIn($field, (array) $value);
+                    break;
+                case 'null':
+                    $query->whereNull($field);
+                    break;
+                case 'notnull':
+                    $query->whereNotNull($field);
+                    break;
+                case 'between':
+                    if (is_array($value) && count($value) === 2) {
+                        $query->whereBetween($field, $value);
+                    }
+                    break;
+                case 'startsWith':
+                    $query->where($field, 'LIKE', "{$value}%");
+                    break;
+                case 'endsWith':
+                    $query->where($field, 'LIKE', "%{$value}");
+                    break;
+            }
+        }
+
+        return $query;
+    }
+}
+```
 
 La paginación es **opcional**. Si no se envía `pagination`, se retorna una `Collection` con todos los registros. Si se envía, se retorna un `LengthAwarePaginator`.
 
@@ -82,59 +239,9 @@ public function filter(array $filters = [], ?array $orderBy = null, ?array $pagi
     return $query->paginate($perPage, ['*'], 'page', $page);
 }
 
-/**
- * Aplica los filtros al query builder.
- * Valida campos permitidos mediante isValidField().
- */
-private function applyFilters($query, array $filters)
+protected function getAllowedFilterFields(): array
 {
-    foreach ($filters as $filter) {
-        if (!isset($filter['field'], $filter['operator'])) {
-            continue;
-        }
-
-        $field    = $filter['field'];
-        $operator = $filter['operator'];
-        $value    = $filter['value'] ?? null;
-
-        if (!$this->isValidField($field)) {
-            continue;
-        }
-
-        switch ($operator) {
-            case 'eq':         $query->where($field, '=', $value); break;
-            case 'ne':         $query->where($field, '!=', $value); break;
-            case 'gt':         $query->where($field, '>', $value); break;
-            case 'gte':        $query->where($field, '>=', $value); break;
-            case 'lt':         $query->where($field, '<', $value); break;
-            case 'lte':        $query->where($field, '<=', $value); break;
-            case 'like':       $query->where($field, 'LIKE', "%{$value}%"); break;
-            case 'ilike':      $query->where($field, 'ILIKE', "%{$value}%"); break;
-            case 'in':         $query->whereIn($field, (array) $value); break;
-            case 'nin':        $query->whereNotIn($field, (array) $value); break;
-            case 'null':       $query->whereNull($field); break;
-            case 'notnull':    $query->whereNotNull($field); break;
-            case 'between':
-                if (is_array($value) && count($value) === 2) {
-                    $query->whereBetween($field, $value);
-                }
-                break;
-            case 'startsWith': $query->where($field, 'LIKE', "{$value}%"); break;
-            case 'endsWith':   $query->where($field, 'LIKE', "%{$value}"); break;
-        }
-    }
-
-    return $query;
-}
-
-/**
- * Valida si el campo existe en la tabla (definir por entidad).
- */
-private function isValidField(string $field): bool
-{
-    $allowedFields = ['id', 'name', 'created_at', 'updated_at']; // extender por entidad
-
-    return in_array($field, $allowedFields);
+    return ['id', 'name', 'created_at', 'updated_at']; // extender por entidad
 }
 ```
 
@@ -217,7 +324,7 @@ class Filter[Entity]Request extends FormRequest
 }
 ```
 
-### 4) Crear la clase FilterResponse esta clase ya no es necesario crearla
+### 4) Crear la clase FilterResponse (esta clase ya no es necesario crearla)
 
 Archivo: `app/Http/Responses/FilterResponse.php`
 
@@ -406,7 +513,7 @@ Respuesta `meta` incluye solo: `total`, `is_paginated: false`.
 
 ### MaterialCategory ✅
 - [x] Repository `filter()` con retorno `LengthAwarePaginator|Collection`
-- [x] Helper `isValidField()` (campos: `id`, `name`, `parent_id`, `created_at`, `updated_at`)
+- [x] Usa trait `AppliesStructuredFilters` + `getAllowedFilterFields()` (campos: `id`, `name`, `parent_id`, `created_at`, `updated_at`)
 - [x] Interface actualizada con tipo de retorno `LengthAwarePaginator|Collection`
 - [x] `FilterMaterialCategoryRequest` con `pagination` nullable y `shouldPaginate()`
 - [x] Controller usa `FilterResponse::fromPaginator()` / `FilterResponse::fromCollection()`
@@ -414,7 +521,7 @@ Respuesta `meta` incluye solo: `total`, `is_paginated: false`.
 
 ### MaterialType ✅
 - [x] Repository `filter()` con retorno `LengthAwarePaginator|Collection`
-- [x] Helper `isValidField()` (campos: `id`, `name`, `code`, `is_active`, `created_at`, `updated_at`)
+- [x] Usa trait `AppliesStructuredFilters` + `getAllowedFilterFields()`
 - [x] Interface actualizada con tipo de retorno `LengthAwarePaginator|Collection`
 - [x] `FilterMaterialTypeRequest` con `pagination` nullable y `shouldPaginate()`
 - [x] Controller usa `FilterResponse::fromPaginator()` / `FilterResponse::fromCollection()`
@@ -422,7 +529,8 @@ Respuesta `meta` incluye solo: `total`, `is_paginated: false`.
 
 ### Template para nuevas entidades
 - [ ] Repository `filter()` con retorno `LengthAwarePaginator|Collection`
-- [ ] Helper privado `isValidField()` con campos de la tabla
+- [ ] Usar trait `AppliesStructuredFilters`
+- [ ] Implementar `getAllowedFilterFields()` con campos de la tabla
 - [ ] Interface actualizada con tipo de retorno `LengthAwarePaginator|Collection`
 - [ ] `Filter[Entity]Request` con `pagination` nullable y `shouldPaginate()`
 - [ ] Controller usa `FilterResponse` (importar `App\Http\Responses\FilterResponse`)
@@ -434,7 +542,8 @@ Respuesta `meta` incluye solo: `total`, `is_paginated: false`.
 ## Consideraciones
 
 - No eliminar endpoints legacy (`/all`, `/search`) hasta completar la migración.
-- Validar campos permitidos mediante `isValidField()` en `applyFilters()` (seguridad contra inyección de columnas).
+- Validar campos permitidos mediante `getAllowedFilterFields()` (seguridad contra inyección de columnas).
+- Reutilizar `app/Repositories/Concerns/AppliesStructuredFilters.php`; no duplicar `applyFilters()` por repository.
 - Usar índices en base de datos para campos frecuentemente filtrados.
 - Limitar `per_page` máximo (actualmente 100) para evitar sobrecarga.
 - La paginación es **opcional**: si no se envía `pagination`, el repository retorna todos los registros como `Collection`.

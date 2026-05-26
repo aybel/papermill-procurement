@@ -180,4 +180,28 @@ class UnitOfMeasureController extends Controller
             ], 500);
         }
     }
+
+    public function filter(Request $request): JsonResponse
+    {
+        try {
+            $filters = $request->input('filters', []);
+            $orderBy = $request->input('order_by', null);
+            $pagination = $request->input('pagination', null);
+
+            Log::info('Filtro de unidades de medida', ['filters' => $filters, 'order_by' => $orderBy, 'pagination' => $pagination]);
+
+            $units = $this->repository->filter($filters, $orderBy, $pagination);
+
+            return response()->json([
+                'success' => true,
+                'data' => $units,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al filtrar unidades de medida',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

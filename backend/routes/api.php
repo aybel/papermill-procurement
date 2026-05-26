@@ -193,6 +193,7 @@ Route::prefix('v1')->group(function () {
 
         // Unidades de medida
         Route::prefix('units-of-measure')->group(function () {
+            Route::get('/filter', [UnitOfMeasureController::class, 'filter']);
             Route::get('search', [UnitOfMeasureController::class, 'search'])->middleware('permission:units_of_measure.view_any');
             Route::get('/', [UnitOfMeasureController::class, 'index'])->middleware('permission:units_of_measure.view_any');
             Route::get('{id}', [UnitOfMeasureController::class, 'show'])->middleware('permission:units_of_measure.view');
