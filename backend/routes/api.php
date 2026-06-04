@@ -40,15 +40,15 @@ Route::prefix('v1')->group(function () {
 
         // Rutas de proveedores (protegidas)
         Route::prefix('suppliers')->group(function () {
-            Route::get('/active', [SupplierController::class, 'active'])->middleware('permission:suppliers.view_any');
-            Route::get('/search', [SupplierController::class, 'search'])->middleware('permission:suppliers.view_any');
-            Route::get('/', [SupplierController::class, 'index'])->middleware('permission:suppliers.view_any');
-            Route::get('/{id}', [SupplierController::class, 'show'])->middleware('permission:suppliers.view');
-            Route::post('/', [SupplierController::class, 'store'])->middleware('permission:suppliers.create');
-            Route::put('/{id}', [SupplierController::class, 'update'])->middleware('permission:suppliers.update');
-            Route::delete('/{id}', [SupplierController::class, 'destroy'])->middleware('permission:suppliers.delete');
-            Route::post('/{id}/restore', [SupplierController::class, 'restore'])->middleware('permission:suppliers.restore');
-            Route::patch('/{id}/scores', [SupplierController::class, 'updateScores'])->middleware('permission:suppliers.update_scores');
+            Route::get('/active', [SupplierController::class, 'active'])->middleware('permission:supplier.view_any');
+            Route::get('/search', [SupplierController::class, 'search'])->middleware('permission:supplier.view_any');
+            Route::get('/', [SupplierController::class, 'index'])->middleware('permission:supplier.view_any');
+            Route::get('/{id}', [SupplierController::class, 'show'])->middleware('permission:supplier.view');
+            Route::post('/', [SupplierController::class, 'store'])->middleware('permission:supplier.create');
+            Route::put('/{id}', [SupplierController::class, 'update'])->middleware('permission:supplier.update');
+            Route::delete('/{id}', [SupplierController::class, 'destroy'])->middleware('permission:supplier.delete');
+            Route::post('/{id}/restore', [SupplierController::class, 'restore'])->middleware('permission:supplier.restore');
+            Route::patch('/{id}/scores', [SupplierController::class, 'updateScores'])->middleware('permission:supplier.update_scores');
         });
 
         // Rutas de materiales (protegidas)

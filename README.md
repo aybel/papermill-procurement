@@ -226,6 +226,24 @@ docker exec -it papermill-php bash
 php artisan test
 ```
 
+## 🛠️ Troubleshooting de rutas/permisos (403 en desarrollo)
+
+Si actualizaste `backend/routes/api.php` o permisos/roles y el sistema sigue respondiendo `403`, limpia cachés dentro del contenedor PHP:
+
+```bash
+docker exec -it papermill-php php artisan optimize:clear
+docker exec -it papermill-php php artisan permission:cache-reset
+docker exec -it papermill-php php artisan route:clear
+docker exec -it papermill-php php artisan config:clear
+docker exec -it papermill-php php artisan view:clear
+```
+
+Si persiste el problema, reinicia el contenedor de PHP:
+
+```bash
+docker restart papermill-php
+```
+
 ## 📊 Base de Datos
 
 El sistema utiliza MySQL 8.0 con las siguientes características:
