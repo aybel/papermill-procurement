@@ -1,65 +1,62 @@
 FROM php:8.4-fpm-alpine
 
-# Install system dependencies
+# Instalar dependencias
 RUN apk add --no-cache \
-    bash \
-    curl \
     git \
-    zip \
     unzip \
+    zip \
+    curl \
     libpng-dev \
-    libwebp-dev \
     libjpeg-turbo-dev \
     freetype-dev \
-    libzip-dev \
     oniguruma-dev \
-    icu-dev \
+    libxml2-dev \
     nodejs \
-    npm \
-    supervisor
+    npm
 
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
-    docker-php-ext-install \
-    pdo \
+# Instalar extensiones PHP
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install -j$(nproc) \
+    gd \
     pdo_mysql \
     mbstring \
     exif \
     pcntl \
     bcmath \
-    gd \
-    zip \
-    intl
+    opcache
 
-# Install Redis extension
-RUN apk add --no-cache $PHPIZE_DEPS && \
-    pecl install redis && \
-    docker-php-ext-enable redis
+# ============================================
+# CONFIGURAR ZONA HORARIA CDMX
+# ============================================
+# Establecer timezone en el sistema
+RUN apk add --no-cache tzdata && \
+    cp /usr/share/zoneinfo/America/Mexico_City /etc/localtime && \
+    echo "America/Mexico_City" > /etc/timezone && \
+    apk del tzdata
 
-# Install Composer
+# Configurar timezone en PHP
+RUN echo "date.timezone=America/Mexico_City" > /usr/local/etc/php/conf.d/timezone.ini
+
+# ============================================
+# INSTALAR COMPOSER
+# ============================================
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy PHP configuration
-COPY php.ini /usr/local/etc/php/conf.d/custom.ini
+# ============================================
+# CONFIGURACIÓN DE PHP
+# ============================================
+RUN echo "memory_limit=256M" > /usr/local/etc/php/conf.d/memory.ini && \
+    echo "upload_max_filesize=100M" > /usr/local/etc/php/conf.d/upload.ini && \
+    echo "post_max_size=100M" > /usr/local/etc/php/conf.d/post.ini && \
+    echo "max_execution_time=300" > /usr/local/etc/php/conf.d/timeout.ini
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Create non-root user
-RUN addgroup -g 1000 -S www && \
-    adduser -u 1000 -S www -G www
+# Instalar Laravel Octane (opcional)
+# RUN composer require laravel/octane
 
-# Change ownership
-RUN chown -R www:www /var/www/html
-
-USER www
-
-# Expose port 9000
+# Exponer puerto
 EXPOSE 9000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD php-fpm -t || exit 1
-
+# Comando por defecto
 CMD ["php-fpm"]
-

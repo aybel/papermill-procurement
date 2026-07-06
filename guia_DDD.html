@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Migración: De MVC a DDD + Hexagonal en Laravel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: #2d3748;
+            background: #f7fafc;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            border-bottom: 4px solid #4299e1;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2b6cb0;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid #4299e1;
+            padding-left: 1rem;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-top: 1.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1.5rem 2rem;
+            color: #4a5568;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: #edf2f7;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #2d3748;
+        }
+
+        pre {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            font-family: 'Fira Code', 'Courier New', monospace;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .note {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .warning {
+            background: #fefcbf;
+            border-left: 4px solid #d69e2e;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .benefit-card {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-top: 4px solid #4299e1;
+        }
+
+        .benefit-card strong {
+            display: block;
+            color: #2b6cb0;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        hr {
+            margin: 2.5rem 0;
+            border: 0;
+            border-top: 2px dashed #e2e8f0;
+        }
+
+        .file-path {
+            background: #edf2f7;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #2b6cb0;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
+            pre {
+                font-size: 0.8rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Guía de Migración: De MVC Tradicional a DDD + Hexagonal en Laravel</h1>
+
+        <h2>1. Introducción y Análisis Inicial</h2>
+        <p>Tu arquitectura actual es un monolito modular basado en MVC con una separación en capas muy limpia. Este es el punto de partida perfecto para evolucionar hacia patrones más avanzados como Domain-Driven Design (DDD) y Arquitectura Hexagonal.</p>
+
+        <h3>Estado Actual vs. Estado Deseado</h3>
+        <ul>
+            <li><strong>Controllers, Requests, Resources</strong> → Adaptadores Primarios (Infraestructura) ✅ Correcto</li>
+            <li><strong>Models (Eloquent)</strong> → Mezcla de Dominio e Infraestructura ⚠️ A mejorar</li>
+            <li><strong>Services, DTOs, Policies</strong> → Capa de Aplicación ✅ Correcto</li>
+        </ul>
+        <div class="note">
+            <strong>⚠️ Cuello de botella:</strong> Los Models de Eloquent mezclan lógica de negocio (Dominio) con detalles de persistencia (Infraestructura), creando acoplamiento con la base de datos y Laravel.
+        </div>
+
+        <h2>2. Estrategia de Migración Incremental (Strangler Pattern)</h2>
+        <p>No intentes reescribir todo. La estrategia más segura es implementar la nueva arquitectura exclusivamente para módulos nuevos y, con el tiempo, migrar los antiguos cuando sea necesario tocarlos.</p>
+
+        <h3>Estructura Final de Carpetas (Nuevos Módulos)</h3>
+        <pre><code>app/
+├── Http/ (Código LEGADO - Intacto)
+│   ├── Controllers/
+│   └── ...
+├── Models/ (Código LEGADO - Intacto)
+├── Services/ (Código LEGADO - Intacto)
+│
+└── Modules/ (NUEVO Código con DDD + Hexagonal)
+    ├── Billing/
+    │   ├── Domain/           # Corazón del negocio (100% independiente)
+    │   │   ├── Entities/     # Ej: Invoice, Payment
+    │   │   ├── ValueObjects/ # Ej: Money, Address, InvoiceId
+    │   │   ├── Repositories/ # Interfaces (ej: InvoiceRepositoryInterface)
+    │   │   └── Events/       # Eventos de dominio
+    │   ├── Application/      # Casos de uso
+    │   │   ├── UseCases/     # Ej: MarkInvoiceAsPaidUseCase
+    │   │   └── DTOs/         # Data Transfer Objects
+    │   └── Infrastructure/   # Implementaciones técnicas (Laravel, DB, APIs)
+    │       ├── Persistence/  # Repositorios con Eloquent
+    │       ├── Http/         # Controladores (Adaptadores Web/API)
+    │       │   └── Controllers/
+    │       ├── Listeners/    # Escuchas de eventos (Laravel)
+    │       └── Providers/    # Service Providers del módulo
+    └── Inventory/ (Otro módulo...)</code></pre>
+
+        <h2>3. Ejemplo Práctico: Creando un Módulo Nuevo "Suscripciones"</h2>
+        <p>Supongamos que el negocio requiere un nuevo sistema de suscripciones. No existe código previo, así que lo haremos bien desde el inicio.</p>
+
+        <h3>Paso 1: Definir el Modelo de Dominio (Capa Domain)</h3>
+        <p>El dominio es puro PHP, sin dependencias de Laravel.</p>
+
+        <div class="file-path">app/Modules/Subscription/Domain/Subscription.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Domain;
+
+use App\Modules\Subscription\Domain\ValueObjects\SubscriptionId;
+use App\Modules\Subscription\Domain\ValueObjects\UserId;
+use App\Modules\Subscription\Domain\ValueObjects\Plan;
+use App\Modules\Subscription\Domain\ValueObjects\Status;
+use App\Modules\Subscription\Domain\Events\SubscriptionActivated;
+
+class Subscription
+{
+    private SubscriptionId $id;
+    private UserId $userId;
+    private Plan $plan;
+    private Status $status;
+    private \DateTimeInterface $createdAt;
+    private array $events = [];
+
+    public function __construct(UserId $userId, Plan $plan)
+    {
+        $this->id = new SubscriptionId();
+        $this->userId = $userId;
+        $this->plan = $plan;
+        $this->status = Status::PENDING;
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    public function activate(): void
+    {
+        if (!$this->canBeActivated()) {
+            throw new \DomainException('La suscripción no puede ser activada en su estado actual.');
+        }
+        $this->status = Status::ACTIVE;
+        $this->events[] = new SubscriptionActivated($this->id, $this->userId);
+    }
+
+    public function cancel(): void
+    {
+        if ($this->status->isCancelled()) {
+            throw new \DomainException('La suscripción ya está cancelada.');
+        }
+        $this->status = Status::CANCELLED;
+    }
+
+    private function canBeActivated(): bool
+    {
+        return $this->status->canBeActivated();
+    }
+
+    public function getId(): SubscriptionId { return $this->id; }
+    public function getUserId(): UserId { return $this->userId; }
+    public function getPlan(): Plan { return $this->plan; }
+    public function getStatus(): Status { return $this->status; }
+
+    public function releaseEvents(): array
+    {
+        $events = $this->events;
+        $this->events = [];
+        return $events;
+    }
+}</code></pre>
+
+        <div class="file-path">app/Modules/Subscription/Domain/ValueObjects/Status.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Domain\ValueObjects;
+
+enum Status: string
+{
+    case PENDING = 'pending';
+    case ACTIVE = 'active';
+    case CANCELLED = 'cancelled';
+    case EXPIRED = 'expired';
+
+    public function canBeActivated(): bool
+    {
+        return in_array($this, [self::PENDING, self::EXPIRED]);
+    }
+
+    public function isActive(): bool
+    {
+        return $this === self::ACTIVE;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this === self::CANCELLED;
+    }
+}</code></pre>
+
+        <h3>Paso 2: Definir la Interfaz del Repositorio (Capa Domain)</h3>
+        <p>Define qué necesita el dominio, no cómo se implementa.</p>
+
+        <div class="file-path">app/Modules/Subscription/Domain/Repositories/SubscriptionRepositoryInterface.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Domain\Repositories;
+
+use App\Modules\Subscription\Domain\Subscription;
+use App\Modules\Subscription\Domain\ValueObjects\SubscriptionId;
+use App\Modules\Subscription\Domain\ValueObjects\UserId;
+
+interface SubscriptionRepositoryInterface
+{
+    public function save(Subscription $subscription): void;
+    public function findById(SubscriptionId $id): ?Subscription;
+    public function findByUserId(UserId $userId): array;
+    public function delete(SubscriptionId $id): void;
+}</code></pre>
+
+        <h3>Paso 3: Implementar el Repositorio en Infraestructura (con Eloquent)</h3>
+        <p>Aquí usamos Eloquent, pero como un detalle de infraestructura. Inyectamos el modelo de Eloquent (SubscriptionModel), que puede ser uno nuevo o uno existente.</p>
+
+        <div class="file-path">app/Modules/Subscription/Infrastructure/Persistence/EloquentSubscriptionRepository.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Infrastructure\Persistence;
+
+use App\Modules\Subscription\Domain\Subscription;
+use App\Modules\Subscription\Domain\Repositories\SubscriptionRepositoryInterface;
+use App\Modules\Subscription\Domain\ValueObjects\Plan as PlanVO;
+use App\Modules\Subscription\Domain\ValueObjects\Status as StatusVO;
+use App\Modules\Subscription\Domain\ValueObjects\SubscriptionId;
+use App\Modules\Subscription\Domain\ValueObjects\UserId;
+use App\Models\SubscriptionModel;
+use App\Models\User;
+
+class EloquentSubscriptionRepository implements SubscriptionRepositoryInterface
+{
+    public function __construct(
+        private SubscriptionModel $model
+    ) {}
+
+    public function save(Subscription $subscription): void
+    {
+        $this->model->updateOrCreate(
+            ['id' => $subscription->getId()->value()],
+            [
+                'user_id' => $subscription->getUserId()->value(),
+                'plan' => $subscription->getPlan()->value,
+                'status' => $subscription->getStatus()->value,
+                'created_at' => $subscription->getCreatedAt(),
+            ]
+        );
+    }
+
+    public function findById(SubscriptionId $id): ?Subscription
+    {
+        $record = $this->model->find($id->value());
+        if (!$record) {
+            return null;
+        }
+        return $this->toDomain($record);
+    }
+
+    public function findByUserId(UserId $userId): array
+    {
+        $records = $this->model->where('user_id', $userId->value())->get();
+        return $records->map(fn($record) => $this->toDomain($record))->toArray();
+    }
+
+    public function delete(SubscriptionId $id): void
+    {
+        $this->model->destroy($id->value());
+    }
+
+    private function toDomain(SubscriptionModel $record): Subscription
+    {
+        $subscription = new Subscription(
+            new UserId($record->user_id),
+            PlanVO::from($record->plan)
+        );
+
+        $reflection = new \ReflectionClass($subscription);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($subscription, new SubscriptionId($record->id));
+
+        $statusProperty = $reflection->getProperty('status');
+        $statusProperty->setAccessible(true);
+        $statusProperty->setValue($subscription, StatusVO::from($record->status));
+
+        return $subscription;
+    }
+}</code></pre>
+
+        <h3>Paso 4: Crear el Caso de Uso (Capa Application)</h3>
+        <p>Los casos de uso orquestan el flujo, pero no contienen lógica de negocio compleja (esa va en las entidades).</p>
+
+        <div class="file-path">app/Modules/Subscription/Application/UseCases/CreateSubscriptionUseCase.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Application\UseCases;
+
+use App\Modules\Subscription\Domain\Subscription;
+use App\Modules\Subscription\Domain\Repositories\SubscriptionRepositoryInterface;
+use App\Modules\Subscription\Domain\ValueObjects\Plan;
+use App\Modules\Subscription\Domain\ValueObjects\UserId;
+use App\Modules\Subscription\Application\DTOs\CreateSubscriptionDTO;
+
+class CreateSubscriptionUseCase
+{
+    public function __construct(
+        private SubscriptionRepositoryInterface $subscriptionRepository
+    ) {}
+
+    public function execute(CreateSubscriptionDTO $dto): Subscription
+    {
+        $existingSubscriptions = $this->subscriptionRepository->findByUserId(
+            new UserId($dto->userId)
+        );
+
+        foreach ($existingSubscriptions as $sub) {
+            if ($sub->getStatus()->isActive()) {
+                throw new \DomainException('El usuario ya tiene una suscripción activa.');
+            }
+        }
+
+        $subscription = new Subscription(
+            new UserId($dto->userId),
+            Plan::from($dto->plan)
+        );
+
+        $this->subscriptionRepository->save($subscription);
+
+        return $subscription;
+    }
+}</code></pre>
+
+        <div class="file-path">app/Modules/Subscription/Application/DTOs/CreateSubscriptionDTO.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Application\DTOs;
+
+class CreateSubscriptionDTO
+{
+    public function __construct(
+        public readonly int $userId,
+        public readonly string $plan
+    ) {}
+
+    public static function fromRequest(array $validated): self
+    {
+        return new self(
+            userId: $validated['user_id'],
+            plan: $validated['plan']
+        );
+    }
+}</code></pre>
+
+        <h3>Paso 5: Crear el Controlador (Capa Infraestructura/Http)</h3>
+        <p>El controlador recibe la request, la valida, llama al caso de uso y transforma la respuesta.</p>
+
+        <div class="file-path">app/Modules/Subscription/Infrastructure/Http/Controllers/SubscriptionController.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Infrastructure\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Modules\Subscription\Application\UseCases\CreateSubscriptionUseCase;
+use App\Modules\Subscription\Application\DTOs\CreateSubscriptionDTO;
+use App\Modules\Subscription\Infrastructure\Http\Requests\CreateSubscriptionRequest;
+use App\Modules\Subscription\Infrastructure\Http\Resources\SubscriptionResource;
+
+class SubscriptionController extends Controller
+{
+    public function __construct(
+        private CreateSubscriptionUseCase $createSubscriptionUseCase
+    ) {}
+
+    public function store(CreateSubscriptionRequest $request)
+    {
+        $dto = CreateSubscriptionDTO::fromRequest($request->validated());
+
+        try {
+            $subscription = $this->createSubscriptionUseCase->execute($dto);
+            return new SubscriptionResource($subscription);
+        } catch (\DomainException $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+}</code></pre>
+
+        <div class="file-path">app/Modules/Subscription/Infrastructure/Http/Requests/CreateSubscriptionRequest.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Infrastructure\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class CreateSubscriptionRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'user_id' => 'required|exists:users,id',
+            'plan' => 'required|in:basic,premium,enterprise',
+        ];
+    }
+}</code></pre>
+
+        <div class="file-path">app/Modules/Subscription/Infrastructure/Http/Resources/SubscriptionResource.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Infrastructure\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+use App\Modules\Subscription\Domain\Subscription;
+
+class SubscriptionResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        /** @var Subscription $subscription */
+        $subscription = $this->resource;
+
+        return [
+            'id' => $subscription->getId()->value(),
+            'user_id' => $subscription->getUserId()->value(),
+            'plan' => $subscription->getPlan()->value,
+            'status' => $subscription->getStatus()->value,
+            'created_at' => $subscription->getCreatedAt()->format('Y-m-d H:i:s'),
+        ];
+    }
+}</code></pre>
+
+        <h3>Paso 6: Registrar Dependencias (Service Provider)</h3>
+        <p>Usamos el contenedor de Laravel para enlazar las interfaces con sus implementaciones.</p>
+
+        <div class="file-path">app/Modules/Subscription/Infrastructure/Providers/SubscriptionServiceProvider.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Infrastructure\Providers;
+
+use Illuminate\Support\ServiceProvider;
+use App\Modules\Subscription\Domain\Repositories\SubscriptionRepositoryInterface;
+use App\Modules\Subscription\Infrastructure\Persistence\EloquentSubscriptionRepository;
+
+class SubscriptionServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->app->bind(
+            SubscriptionRepositoryInterface::class,
+            EloquentSubscriptionRepository::class
+        );
+
+        $this->app->bind(CreateSubscriptionUseCase::class, function ($app) {
+            return new CreateSubscriptionUseCase(
+                $app->make(SubscriptionRepositoryInterface::class)
+            );
+        });
+    }
+
+    public function boot(): void
+    {
+        $this->loadRoutesFrom(__DIR__ . '/../Http/routes.php');
+        $this->loadMigrationsFrom(__DIR__ . '/../../../database/migrations');
+    }
+}</code></pre>
+
+        <div class="file-path">app/Modules/Subscription/Infrastructure/Http/routes.php</div>
+        <pre><code>&lt;?php
+
+use Illuminate\Support\Facades\Route;
+use App\Modules\Subscription\Infrastructure\Http\Controllers\SubscriptionController;
+
+Route::prefix('api/v2/subscriptions')->group(function () {
+    Route::post('/', [SubscriptionController::class, 'store']);
+});</code></pre>
+
+        <p><strong>Registrar el Provider en <code>config/app.php</code>:</strong></p>
+        <pre><code>'providers' => [
+    // Otros providers...
+    App\Modules\Subscription\Infrastructure\Providers\SubscriptionServiceProvider::class,
+],</code></pre>
+
+        <h3>Paso 7: Integración con Código Legado</h3>
+        <p>Tu módulo nuevo puede consumir modelos o servicios antiguos sin problemas, manteniendo la dirección de dependencias (el nuevo depende del viejo, pero el viejo no sabe del nuevo).</p>
+
+        <div class="file-path">app/Modules/Subscription/Infrastructure/Services/LegacyUserService.php</div>
+        <pre><code>&lt;?php
+
+namespace App\Modules\Subscription\Infrastructure\Services;
+
+use App\Models\User;
+use App\Modules\Subscription\Domain\ValueObjects\UserId;
+
+class LegacyUserService
+{
+    public function getUserEmail(UserId $userId): ?string
+    {
+        $user = User::find($userId->value());
+        return $user?->email;
+    }
+
+    public function userExists(UserId $userId): bool
+    {
+        return User::where('id', $userId->value())->exists();
+    }
+}</code></pre>
+
+        <h2>4. Beneficios Inmediatos de la Nueva Arquitectura</h2>
+        <div class="benefit-grid">
+            <div class="benefit-card">
+                <strong>🧩 Aislamiento del Negocio</strong>
+                La lógica crítica vive en Domain y puede ser testeada sin Laravel.
+            </div>
+            <div class="benefit-card">
+                <strong>🔄 Flexibilidad Tecnológica</strong>
+                Cambiar de Eloquent a otro ORM solo implica crear una nueva implementación en Infrastructure.
+            </div>
+            <div class="benefit-card">
+                <strong>🧪 Testabilidad</strong>
+                Unitarios: Entidades de dominio y Value Objects se prueban de forma aislada. Integración: Repositorios se prueban con base de datos de testing.
+            </div>
+        </div>
+
+        <h3>Ejemplo de Test Unitario de Dominio:</h3>
+        <pre><code>// tests/Unit/Modules/Subscription/Domain/SubscriptionTest.php
+
+test('una suscripción pendiente puede ser activada', function () {
+    $subscription = new Subscription(
+        new UserId(1),
+        Plan::BASIC
+    );
+
+    expect($subscription->getStatus())->toBe(Status::PENDING);
+
+    $subscription->activate();
+
+    expect($subscription->getStatus())->toBe(Status::ACTIVE);
+});
+
+test('una suscripción activa no puede ser activada de nuevo', function () {
+    $subscription = new Subscription(new UserId(1), Plan::BASIC);
+    $subscription->activate();
+
+    expect(fn() => $subscription->activate())
+        ->toThrow(\DomainException::class);
+});</code></pre>
+
+        <h2>5. Cuándo y Cómo Migrar Módulos Antiguos</h2>
+        <p>No hay prisa. Puedes migrar cuando:</p>
+        <ul>
+            <li>Necesites añadir una funcionalidad compleja a un módulo antiguo.</li>
+            <li>Corrigiendo bugs en un módulo que se toca con frecuencia.</li>
+            <li>En periodos de baja demanda, eligiendo módulos de bajo riesgo.</li>
+        </ul>
+
+        <h4>Estrategia para migrar un módulo antiguo (ej. ProductsController):</h4>
+        <ol>
+            <li>Crear la estructura <code>app/Modules/Product/</code> con sus subcarpetas.</li>
+            <li>Mover la lógica de negocio de Product (si la hay) a <code>Domain/Entities/Product.php</code>.</li>
+            <li>Crear la interfaz <code>ProductRepositoryInterface</code> en <code>Domain/Repositories/</code>.</li>
+            <li>Mover la lógica de base de datos a <code>Infrastructure/Persistence/EloquentProductRepository</code>.</li>
+            <li>Mover la lógica de casos de uso a <code>Application/UseCases/</code>.</li>
+            <li>Crear el nuevo controlador en <code>Infrastructure/Http/Controllers/</code>.</li>
+            <li>Una vez probado, cambiar la ruta en <code>routes/api.php</code> para que apunte al nuevo controlador.</li>
+            <li>Eliminar el código antiguo (Controlador, Servicio, etc.) gradualmente.</li>
+        </ol>
+
+        <h2>6. Conclusión y Recomendaciones Finales</h2>
+        <div class="note">
+            <p><strong>✅ Empieza por lo nuevo:</strong> Implementa DDD/Hexagonal solo en módulos que desarrolles a partir de hoy.</p>
+            <p><strong>🚫 No mezcles:</strong> Mantén el código legado y el nuevo estrictamente separados.</p>
+            <p><strong>🎯 Sé pragmático:</strong> No fuerces DDD en cada línea; úsalo donde el negocio lo justifique.</p>
+            <p><strong>📈 Aprende gradualmente:</strong> A medida que tu equipo gane confianza, podrán migrar más módulos.</p>
+        </div>
+
+        <p>Tu arquitectura actual es una base excelente. Con esta evolución, tendrás un sistema mucho más mantenible, testeable y preparado para el futuro, sin necesidad de una reescritura traumática.</p>
+
+        <p style="text-align: center; font-size: 1.3rem; margin-top: 2rem;"><strong>¡Adelante! El primer módulo nuevo que construyas con este enfoque te convencerá 🚀</strong></p>
+    </div>
+</body>
+</html>

@@ -1,7 +1,6 @@
-
 services:
   nginx:
-    image: nginx:alpine
+    image: nginx:1.27-alpine
     container_name: papermill-nginx
     ports:
       - "8088:80"
@@ -12,6 +11,14 @@ services:
       - php
     networks:
       - papermill-network
+    restart: unless-stopped
+    environment:
+      - TZ=America/Mexico_City  
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   php:
     build:
@@ -23,40 +30,74 @@ services:
     networks:
       - papermill-network
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    environment:
+      - TZ=America/Mexico_City 
+      - APP_DEBUG=true
+      - APP_TIMEZONE=America/Mexico_City  
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=papermill_db
+      - DB_USERNAME=papermill_user
+      - DB_PASSWORD=papermill_pass
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8.4
     container_name: papermill-mysql
     ports:
       - "3307:3306"
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - TZ=America/Mexico_City  
       - MYSQL_ROOT_PASSWORD=rootpassword
       - MYSQL_DATABASE=papermill_db
       - MYSQL_USER=papermill_user
       - MYSQL_PASSWORD=papermill_pass
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     networks:
       - papermill-network
-
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   redis:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
     container_name: papermill-redis
     ports:
       - "6381:6379"
     networks:
       - papermill-network
+    restart: unless-stopped
+    environment:
+      - TZ=America/Mexico_City  
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    command: redis-server --appendonly yes
+
   mailhog:
-    image: mailhog/mailhog
+    image: mailhog/mailhog:latest
     container_name: papermill-mailhog
     ports:
-      - "1025:1025"  # SMTP
-      - "8025:8025"  # Interfaz web
+      - "1025:1025"
+      - "8025:8025"
     networks:
       - papermill-network
+    restart: unless-stopped
+    environment:
+      - TZ=America/Mexico_City  
 
 networks:
   papermill-network:
@@ -65,4 +106,3 @@ networks:
 volumes:
   mysql_data:
     driver: local
-
