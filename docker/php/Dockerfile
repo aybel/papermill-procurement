@@ -12,7 +12,9 @@ RUN apk add --no-cache \
     oniguruma-dev \
     libxml2-dev \
     nodejs \
-    npm
+    npm \
+    bash \
+    bash-completion
 
 # Instalar extensiones PHP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
