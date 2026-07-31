@@ -180,6 +180,9 @@ Luego vuelve a ejecutar `docker compose up -d --build`.
 ### Error 403 por cache/rutas/permisos
 
 ```bash
+docker exec -it papermill-php php artisan config:clear
+docker exec -it papermill-php php artisan cache:clear
+docker exec -it papermill-php php artisan route:clear
 docker exec -it papermill-php php artisan optimize:clear
 docker exec -it papermill-php php artisan permission:cache-reset
 docker restart papermill-php
