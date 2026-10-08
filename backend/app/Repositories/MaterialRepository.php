@@ -5,15 +5,17 @@ namespace App\Repositories;
 use App\Models\Material;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use App\Repositories\Concerns\AppliesStructuredFilters;
 
 class MaterialRepository implements MaterialRepositoryInterface
 {
-    protected $model;
+    use AppliesStructuredFilters;
 
-    public function __construct(Material $model)
+    public function __construct(private Material $model)
     {
         $this->model = $model;
     }
+
 
     public function getAllPaginated(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
@@ -106,5 +108,72 @@ class MaterialRepository implements MaterialRepositoryInterface
                     ->orWhere('sku', 'like', "%{$search}%");
             })
             ->paginate($perPage);
+    }
+    public function filter(array $filters = [], ?array $orderBy = null, ?array $pagination = null): LengthAwarePaginator|Collection
+    {
+        $query = $this->model->newQuery();
+
+        $query = $this->model->newQuery();
+
+        // Aplicar filtros
+        if (!empty($filters)) {
+            $query = $this->applyFilters($query, $filters);
+        }
+
+        // Aplicar ordenamiento
+        if ($orderBy && isset($orderBy['column'], $orderBy['direction'])) {
+            $direction = in_array(strtolower($orderBy['direction']), ['asc', 'desc'])
+                ? $orderBy['direction']
+                : 'asc';
+            $query->orderBy($orderBy['column'], $direction);
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+
+        // Caso 1: Sin paginación (traer todos)
+        if (is_null($pagination)) {
+            return $query->get();
+        }
+
+        // Caso 2: Paginación con límite personalizado
+        $perPage = $pagination['limit'] ?? 15;
+        $page = $pagination['page'] ?? 1;
+
+        // Caso especial: Si limit es 0 o null, traer todos
+        if ($perPage === 0 || $perPage === null) {
+            return $query->get();
+        }
+
+        return $query->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * Campos permitidos para filtrar en esta entidad.
+     */
+    protected function getAllowedFilterFields(): array
+    {
+        return [
+            'id',
+            'sku',
+            'name',
+            'description',
+            'category_id',
+            'currency_id',
+            'material_type_id',
+            'unit_of_measure_id',
+            'current_stock',
+            'min_stock',
+            'max_stock',
+            'safety_stock',
+            'reorder_point',
+            'avg_unit_cost',
+            'last_purchase_price',
+            'grammage',
+            'width',
+            'length',
+            'color',
+            'created_at',
+            'updated_at'
+        ];
     }
 }

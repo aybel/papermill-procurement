@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Http\Requests\StoreMaterialRequest;
+use App\Http\Requests\FilterMaterialRequest;
 use App\Http\Requests\UpdateMaterialRequest;
 use App\Repositories\MaterialRepositoryInterface;
 use App\Services\SKUGenerator;
@@ -10,6 +12,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use App\Http\Responses\FilterResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 
 class MaterialController extends Controller
 {
@@ -187,6 +192,39 @@ class MaterialController extends Controller
                 'success' => false,
                 'message' => 'Error al buscar materiales',
                 'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    /**
+     * Filtrado avanzado de registros.
+     */
+    public function filter(FilterMaterialRequest $request): JsonResponse
+    {
+        try {
+            $filters    = $request->input('filters', []);
+            $orderBy    = $request->input('order_by');
+            $pagination = $request->input('pagination', null);
+
+            $result = $this->materialRepository->filter($filters, $orderBy, $pagination);
+
+            $response = $result instanceof LengthAwarePaginator
+                ? FilterResponse::fromPaginator($result)
+                : FilterResponse::fromCollection($result);
+
+            return response()->json($response->toResponse());
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Errores de validación',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al filtrar registros',
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }

@@ -53,8 +53,9 @@ Route::prefix('v1')->group(function () {
 
         // Rutas de materiales (protegidas)
         Route::prefix('materials')->group(function () {
-            Route::get('/search', [MaterialController::class, 'search']);
-            Route::get('/', [MaterialController::class, 'index']);
+            Route::get('/search', [MaterialController::class, 'search'])->middleware('permission:materials.view_any');
+            Route::get('/filter', [MaterialController::class, 'filter'])->middleware('permission:materials.view_any');
+            Route::get('/', [MaterialController::class, 'index'])->middleware('permission:materials.view_any');
             Route::get('/{id}', [MaterialController::class, 'show'])->middleware('permission:materials.view');
             Route::post('/', [MaterialController::class, 'store'])->middleware('permission:materials.create');
             Route::put('/{id}', [MaterialController::class, 'update'])->middleware('permission:materials.update');

@@ -47,4 +47,9 @@ interface MaterialRepositoryInterface
      * Buscar materiales por término.
      */
     public function search(string $search, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Filtrado avanzado con múltiples condiciones.
+     */
+    public function filter(array $filters = [], ?array $orderBy = null, ?array $pagination = null): LengthAwarePaginator|Collection;
 }
