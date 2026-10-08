@@ -30,7 +30,9 @@ trait AppliesStructuredFilters
             if (!in_array($field, $allowedFields, true)) {
                 continue;
             }
-
+            if ($this->applyCustomFilter($field, $operator, $value)) {
+                continue;
+            }
             $value = $this->normalizeFilterValue($field, $value);
 
             switch ($operator) {
@@ -61,11 +63,6 @@ trait AppliesStructuredFilters
                 case 'like':
                     $query->where($field, 'LIKE', "%{$value}%");
                     break;
-
-                case 'ilike':
-                    $query->where($field, 'ILIKE', "%{$value}%");
-                    break;
-
                 case 'in':
                     $query->whereIn($field, (array) $value);
                     break;
@@ -119,5 +116,13 @@ trait AppliesStructuredFilters
         }
 
         return $value;
+    }
+
+    protected function applyCustomFilter(
+        string $field,
+        string $operator,
+        mixed $value
+    ): bool {
+        return false;
     }
 }

@@ -16,7 +16,7 @@ class FilterRequest extends FormRequest
         return [
             'filters' => 'sometimes|array',
             'filters.*.field' => 'required|string',
-            'filters.*.operator' => 'required|string|in:eq,ne,gt,gte,lt,lte,like,ilike,in,nin,null,notnull,between,startsWith,endsWith',
+            'filters.*.operator' => 'required|string|in:eq,ne,gt,gte,lt,lte,like,in,nin,null,notnull,between,startsWith,endsWith',
             'filters.*.value' => 'required_unless:filters.*.operator,null,notnull',
 
             'order_by' => 'sometimes|array',

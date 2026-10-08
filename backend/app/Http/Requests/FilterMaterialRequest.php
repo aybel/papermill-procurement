@@ -15,12 +15,12 @@ class FilterMaterialRequest extends FormRequest
     {
         return [
             'filters'            => 'sometimes|array',
-            'filters.*.field'    => 'required|string|in:id,name,...',   // campos permitidos por entidad
-            'filters.*.operator' => 'required|string|in:eq,ne,gt,gte,lt,lte,like,ilike,in,nin,null,notnull,between,startsWith,endsWith',
+            'filters.*.field'    => 'required|string|in:id,name,description,last_purchase_price,category.name,current_stock,max_stock,min_stock,sku,created_at,updated_at',   // campos permitidos por entidad
+            'filters.*.operator' => 'required|string|in:eq,ne,gt,gte,lt,lte,like,in,nin,null,notnull,between,startsWith,endsWith',
             'filters.*.value'    => 'required_unless:filters.*.operator,null,notnull',
 
             'order_by'           => 'sometimes|array',
-            'order_by.column'    => 'required_with:order_by|string|in:id,name,...', // columnas permitidas por entidad
+            'order_by.column'    => 'required_with:order_by|string|in:id,name,description,last_purchase_price,category.name,current_stock,max_stock,min_stock,sku,created_at,updated_at', // columnas permitidas por entidad
             'order_by.direction' => 'required_with:order_by|string|in:asc,desc',
 
             'pagination'         => 'sometimes|array|nullable',  // nullable = sin paginación → todos

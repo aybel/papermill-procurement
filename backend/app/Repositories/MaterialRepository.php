@@ -105,14 +105,15 @@ class MaterialRepository implements MaterialRepositoryInterface
             ->with(['category', 'currency', 'materialType', 'unitOfMeasure'])
             ->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('last_purchase_price', 'like', "%{$search}%")
+                    ->orWhere('current_stock', 'like', "%{$search}%");
             })
             ->paginate($perPage);
     }
     public function filter(array $filters = [], ?array $orderBy = null, ?array $pagination = null): LengthAwarePaginator|Collection
     {
-        $query = $this->model->newQuery();
-
         $query = $this->model->newQuery();
 
         // Aplicar filtros
@@ -132,7 +133,7 @@ class MaterialRepository implements MaterialRepositoryInterface
 
         // Caso 1: Sin paginación (traer todos)
         if (is_null($pagination)) {
-            return $query->get();
+            return $query->with(['category', 'currency', 'materialType', 'unitOfMeasure'])->get();
         }
 
         // Caso 2: Paginación con límite personalizado
@@ -141,10 +142,10 @@ class MaterialRepository implements MaterialRepositoryInterface
 
         // Caso especial: Si limit es 0 o null, traer todos
         if ($perPage === 0 || $perPage === null) {
-            return $query->get();
+            return $query->with(['category', 'currency', 'materialType', 'unitOfMeasure'])->get();
         }
 
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        return $query->with(['category', 'currency', 'materialType', 'unitOfMeasure'])->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -158,6 +159,10 @@ class MaterialRepository implements MaterialRepositoryInterface
             'name',
             'description',
             'category_id',
+            'category.name',
+            'currency.name',
+            'materialType.name',
+            'unitOfMeasure.name',
             'currency_id',
             'material_type_id',
             'unit_of_measure_id',
@@ -175,5 +180,59 @@ class MaterialRepository implements MaterialRepositoryInterface
             'created_at',
             'updated_at'
         ];
+    }
+    /**
+     * Aplica filtros personalizados para la entidad Material.
+     *
+     * @param string $field
+     * @param string $operator
+     * @param mixed $value
+     * @return bool
+     */
+    protected function applyCustomFilter(string $field, string $operator, mixed $value): bool
+    {
+        $query = $this->model->newQuery();
+
+        switch ($field) {
+            case 'category.name':
+                if ($operator === 'like') {
+                    $query->whereHas('category', function ($categoryQuery) use ($value) {
+                        $categoryQuery->where('name', 'LIKE', "%{$value}%");
+                    });
+
+                    return true;
+                }
+                break;
+            case 'currency.name':
+                if ($operator === 'like') {
+                    $query->whereHas('currency', function ($currencyQuery) use ($value) {
+                        $currencyQuery->where('name', 'LIKE', "%{$value}%");
+                    });
+
+                    return true;
+                }
+                break;
+            case 'materialType.name':
+                if ($operator === 'like') {
+                    $query->whereHas('material_types', function ($materialTypeQuery) use ($value) {
+                        $materialTypeQuery->where('name', 'LIKE', "%{$value}%");
+                    });
+
+                    return true;
+                }
+                break;
+            case 'unitOfMeasure.name':
+                if ($operator === 'like') {
+                    $query->whereHas('units_of_measure', function ($unitOfMeasureQuery) use ($value) {
+                        $unitOfMeasureQuery->where('name', 'LIKE', "%{$value}%");
+                    });
+
+                    return true;
+                }
+                break;
+        }
+
+
+        return false;
     }
 }
