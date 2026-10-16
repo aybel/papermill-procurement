@@ -527,6 +527,22 @@ Respuesta `meta` incluye solo: `total`, `is_paginated: false`.
 - [x] Controller usa `FilterResponse::fromPaginator()` / `FilterResponse::fromCollection()`
 - [x] Rutas `GET /filter` y `POST /filter` registradas antes de `GET /{id}`
 
+### Material ✅
+- [x] Repository `filter()` con retorno `LengthAwarePaginator|Collection`
+- [x] Usa trait `AppliesStructuredFilters` + `getAllowedFilterFields()`
+- [x] Interface actualizada con tipo de retorno `LengthAwarePaginator|Collection`
+- [x] `FilterMaterialTypeRequest` con `pagination` nullable y `shouldPaginate()`
+- [x] Controller usa `FilterResponse::fromPaginator()` / `FilterResponse::fromCollection()`
+- [x] Rutas `GET /filter` y `POST /filter` registradas antes de `GET /{id}`
+
+### BudgetCategory
+- [ ] Repository 
+- [ ] Usar trait
+- [ ] Inferface actualiza con el tipo de retorno
+- [ ] `FilterMaterialTypeRequest` con `pagination` nullable y `shouldPaginate()`
+- [ ] Controller usa `FilterResponse::fromPaginator()` / `FilterResponse::fromCollection()`
+- [ ] Rutas `GET /filter` y `POST /filter` registradas antes de `GET /{id}`
+
 ### Template para nuevas entidades
 - [ ] Repository `filter()` con retorno `LengthAwarePaginator|Collection`
 - [ ] Usar trait `AppliesStructuredFilters`
